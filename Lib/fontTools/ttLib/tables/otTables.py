@@ -2139,6 +2139,7 @@ class Paint(getFormatSwitchingBaseTableClass("uint8")):
 # subclass for each alternate field name.
 #
 _equivalents = {
+    "IFT ": ("IFTX",),
     "MarkArray": ("Mark1Array",),
     "LangSys": ("DefaultLangSys",),
     "Coverage": (
@@ -2585,7 +2586,7 @@ def _buildClasses():
     import re
     from .otData import otData
 
-    formatPat = re.compile(r"([A-Za-z0-9]+)Format(\d+)$")
+    formatPat = re.compile(r"([A-Za-z0-9 ]+)Format(\d+)$")
     namespace = globals()
 
     # populate module with classes

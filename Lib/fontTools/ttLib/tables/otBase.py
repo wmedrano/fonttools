@@ -851,7 +851,7 @@ class CountReference(object):
         v = self.table[self.name]
         if v is None:
             v = 0
-        return {1: packUInt8, 2: packUShort, 4: packULong}[self.size](v)
+        return {1: packUInt8, 2: packUShort, 3: packUInt24, 4: packULong}[self.size](v)
 
 
 def packUInt8(value):
@@ -933,7 +933,9 @@ class BaseTable(object):
             if conv.repeat:
                 if not hasattr(self, conv.name):
                     setattr(self, conv.name, [])
-                countValue = len(getattr(self, conv.name)) - conv.aux
+                countValue = len(getattr(self, conv.name))
+                if conv.aux:
+                    countValue -= conv.aux
                 try:
                     count_conv = self.getConverterByName(conv.repeat)
                     setattr(self, conv.repeat, countValue)
@@ -977,7 +979,8 @@ class BaseTable(object):
                     else:
                         # conv.repeat is a propagated count
                         countValue = reader[conv.repeat]
-                    countValue += conv.aux
+                    if conv.aux:
+                        countValue += conv.aux
                     table[conv.name] = conv.readArray(reader, font, table, countValue)
                 else:
                     if conv.aux and not eval(conv.aux, None, table):
@@ -1037,7 +1040,9 @@ class BaseTable(object):
             if conv.repeat:
                 if value is None:
                     value = []
-                countValue = len(value) - conv.aux
+                countValue = len(value)
+                if conv.aux:
+                    countValue -= conv.aux
                 if isinstance(conv.repeat, int):
                     assert len(value) == conv.repeat, "expected %d values, got %d" % (
                         conv.repeat,

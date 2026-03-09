@@ -56,10 +56,13 @@ def buildConverters(tableSpec, tableNamespace):
         if name.startswith("ValueFormat"):
             assert tp == "uint16"
             converterClass = ValueFormat
-        elif name.endswith("Count") or name in ("StructLength", "MorphType"):
+        elif (
+            name.endswith("Count") or name in ("StructLength", "MorphType")
+        ) and tp in ("uint8", "uint16", "uint24", "uint32"):
             converterClass = {
                 "uint8": ComputedUInt8,
                 "uint16": ComputedUShort,
+                "uint24": ComputedUInt24,
                 "uint32": ComputedULong,
             }[tp]
         elif name == "SubTable":
@@ -141,6 +144,8 @@ class BaseConverter(object):
             "BaseGlyphRecordCount",
             "LayerRecordCount",
             "AxisIndicesList",
+            "MaxEntryIndex",
+            "GlyphNum",
         ]
         self.description = description
 
@@ -383,6 +388,10 @@ class ComputedUShort(ComputedInt, UShort):
 
 
 class ComputedULong(ComputedInt, ULong):
+    pass
+
+
+class ComputedUInt24(ComputedInt, UInt24):
     pass
 
 
@@ -2017,6 +2026,147 @@ class CompositeMode(_UInt8Enum):
     enumClass = _CompositeMode
 
 
+class Data(BaseConverter):
+    def __init__(self, name, repeat, aux, tableClass=None, *, description="", lengthField=None):
+        BaseConverter.__init__(self, name, repeat, aux, tableClass, description=description)
+        self.lengthField = lengthField
+
+    def read(self, reader, font, tableDict):
+        count = tableDict.get(self.lengthField)
+        if count is None:
+            count = reader[self.lengthField]
+        return reader.readData(count)
+
+    def write(self, writer, font, tableDict, value, repeatIndex=None):
+        writer.writeData(value)
+
+    def xmlWrite(self, xmlWriter, font, value, name, attrs):
+        from fontTools.misc.textTools import hexStr
+
+        xmlWriter.simpletag(name, attrs + [("value", hexStr(value))])
+        xmlWriter.newline()
+
+    def xmlRead(self, attrs, content, font):
+        from fontTools.misc.textTools import deHexStr
+
+        return deHexStr(attrs["value"])
+
+
+class IFTBitMap(BaseConverter):
+    def __init__(self, name, repeat, aux, tableClass=None, *, description="", lengthField=None):
+        BaseConverter.__init__(self, name, repeat, aux, tableClass, description=description)
+        self.lengthField = lengthField
+
+    def read(self, reader, font, tableDict):
+        maxEntryIndex = tableDict.get(self.lengthField)
+        if maxEntryIndex is None:
+            maxEntryIndex = reader[self.lengthField]
+        count = (maxEntryIndex + 8) // 8
+        return reader.readData(count)
+
+    def write(self, writer, font, tableDict, value, repeatIndex=None):
+        writer.writeData(value)
+
+    def xmlWrite(self, xmlWriter, font, value, name, attrs):
+        from fontTools.misc.textTools import hexStr
+
+        xmlWriter.simpletag(name, attrs + [("value", hexStr(value))])
+        xmlWriter.newline()
+
+    def xmlRead(self, attrs, content, font):
+        from fontTools.misc.textTools import deHexStr
+
+        return deHexStr(attrs["value"])
+
+
+class IFTEntryIndex(IntValue):
+    def read(self, reader, font, tableDict):
+        if reader["MaxEntryIndex"] < 256:
+            return reader.readUInt8()
+        else:
+            return reader.readUShort()
+
+    def write(self, writer, font, tableDict, value, repeatIndex=None):
+        if writer["MaxEntryIndex"] < 256:
+            writer.writeUInt8(value)
+        else:
+            writer.writeUShort(value)
+
+
+class IFTGlyphMapEntryIndices(BaseConverter):
+    def read(self, reader, font, tableDict, count=None):
+        if count is None:
+            count = reader["GlyphNum"] - tableDict["FirstMappedGlyph"]
+        if reader["MaxEntryIndex"] < 256:
+            return reader.readUInt8Array(count)
+        else:
+            return reader.readUShortArray(count)
+
+    def write(self, writer, font, tableDict, value, repeatIndex=None):
+        if writer["MaxEntryIndex"] < 256:
+            writer.writeUInt8Array(value)
+        else:
+            writer.writeUShortArray(value)
+
+    def xmlWrite(self, xmlWriter, font, value, name, attrs):
+        xmlWriter.simpletag(name, attrs + [("value", " ".join(str(v) for v in value))])
+        xmlWriter.newline()
+
+    def xmlRead(self, attrs, content, font):
+        return [int(v) for v in attrs["value"].split()]
+
+
+class IFTEntryMapRecords(BaseConverter):
+    def read(self, reader, font, tableDict):
+        from . import otTables
+
+        featureRecords = tableDict["FeatureRecords"]
+        count = sum(r.EntryMapNum for r in featureRecords)
+        isUint16 = reader["MaxEntryIndex"] >= 256
+        res = []
+        for _ in range(count):
+            rec = otTables.IFTEntryMapRecord()
+            if isUint16:
+                rec.FirstEntryIndex = reader.readUShort()
+                rec.LastEntryIndex = reader.readUShort()
+            else:
+                rec.FirstEntryIndex = reader.readUInt8()
+                rec.LastEntryIndex = reader.readUInt8()
+            res.append(rec)
+        return res
+
+    def write(self, writer, font, tableDict, value, repeatIndex=None):
+        isUint16 = writer["MaxEntryIndex"] >= 256
+        for rec in value:
+            if isUint16:
+                writer.writeUShort(rec.FirstEntryIndex)
+                writer.writeUShort(rec.LastEntryIndex)
+            else:
+                writer.writeUInt8(rec.FirstEntryIndex)
+                writer.writeUInt8(rec.LastEntryIndex)
+
+    def xmlWrite(self, xmlWriter, font, value, name, attrs):
+        xmlWriter.begintag(name, attrs)
+        xmlWriter.newline()
+        for rec in value:
+            rec.toXML(xmlWriter, font)
+        xmlWriter.endtag(name)
+        xmlWriter.newline()
+
+    def xmlRead(self, attrs, content, font):
+        from . import otTables
+
+        res = []
+        for element in content:
+            if isinstance(element, tuple):
+                name, attrs, content = element
+                if name == "IFTEntryMapRecord":
+                    rec = otTables.IFTEntryMapRecord()
+                    rec.fromXML(name, attrs, content, font)
+                    res.append(rec)
+        return res
+
+
 converterMapping = {
     # type		class
     "int8": Int8,
@@ -2053,6 +2203,12 @@ converterMapping = {
     "STATFlags": STATFlags,
     "TupleList": partial(CFF2Index, itemConverterClass=TupleValues),
     "VarCompositeGlyphList": partial(CFF2Index, itemClass=VarCompositeGlyph),
+    # IFT
+    "Data": lambda C: lambda name, repeat, aux, **kwargs: Data(name, repeat, aux, lengthField=C, **kwargs),
+    "IFTBitMap": lambda C: lambda name, repeat, aux, **kwargs: IFTBitMap(name, repeat, aux, lengthField=C, **kwargs),
+    "IFTEntryIndex": IFTEntryIndex,
+    "IFTGlyphMapEntryIndices": IFTGlyphMapEntryIndices,
+    "IFTEntryMapRecords": IFTEntryMapRecords,
     # AAT
     "CIDGlyphMap": CIDGlyphMap,
     "GlyphCIDMap": GlyphCIDMap,

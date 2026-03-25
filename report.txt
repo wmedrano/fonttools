@@ -1,0 +1,50 @@
+=============================================================
+  An exception occurred while round tripping  "."
+Traceback (most recent call last):
+  File "/usr/local/google/home/wmedrano/src/fonttools/Lib/fontTools/misc/macRes.py", line 40, in __init__
+    self.file = self.openResourceFork(fileOrPath)
+                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/usr/local/google/home/wmedrano/src/fonttools/Lib/fontTools/misc/macRes.py", line 52, in openResourceFork
+    with open(path + "/..namedfork/rsrc", "rb") as resfork:
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './..namedfork/rsrc'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/google/home/wmedrano/src/fonttools/MetaTools/roundTrip.py", line 41, in roundTrip
+    ttx.ttDump(ttFile1, xmlFile1, options)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/google/home/wmedrano/src/fonttools/Lib/fontTools/misc/loggingTools.py", line 375, in wrapper
+    return func(*args, **kwds)
+  File "/usr/local/google/home/wmedrano/src/fonttools/Lib/fontTools/ttx.py", line 298, in ttDump
+    ttf = TTFont(
+        input,
+    ...<2 lines>...
+        fontNumber=options.fontNumber,
+    )
+  File "/usr/local/google/home/wmedrano/src/fonttools/Lib/fontTools/ttLib/ttFont.py", line 278, in __init__
+    if macUtils.getSFNTResIndices(file):
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/local/google/home/wmedrano/src/fonttools/Lib/fontTools/ttLib/macUtils.py", line 10, in getSFNTResIndices
+    reader = ResourceReader(path)
+  File "/usr/local/google/home/wmedrano/src/fonttools/Lib/fontTools/misc/macRes.py", line 45, in __init__
+    self.file = self.openDataFork(fileOrPath)
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/usr/local/google/home/wmedrano/src/fonttools/Lib/fontTools/misc/macRes.py", line 60, in openDataFork
+    with open(path, "rb") as datafork:
+         ~~~~^^^^^^^^^^^^
+IsADirectoryError: [Errno 21] Is a directory: '.'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/google/home/wmedrano/src/fonttools/MetaTools/roundTrip.py", line 90, in main
+    roundTrip(ttFile, options, report)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/google/home/wmedrano/src/fonttools/MetaTools/roundTrip.py", line 73, in roundTrip
+    if os.path.exists(tmpFile):
+       ~~~~~~~~~~~~~~^^^^^^^^^
+  File "<frozen genericpath>", line 19, in exists
+TypeError: stat: path should be string, bytes, os.PathLike or integer, not tuple
+-------------------------------------------------------------

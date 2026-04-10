@@ -2,7 +2,7 @@
 used to define the schema of OpenType tables in otData.py.
 """
 
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, List, Optional
 
 
 class FieldSpec(NamedTuple):
@@ -35,3 +35,19 @@ class FieldSpec(NamedTuple):
     repeat: Any = None
     aux: Any = None
     description: str = ""
+
+
+class TableSpec(NamedTuple):
+    """Represents an OpenType table schema.
+
+    These are defined in `otData.py`.
+
+    Attributes:
+        name: The name of the table.
+        fields: A list of FieldSpec objects defining the table's fields.
+        tableFormat: An optional format identifier for format-switching tables.
+    """
+
+    name: str
+    fields: List[FieldSpec]
+    tableFormat: Optional[int] = None

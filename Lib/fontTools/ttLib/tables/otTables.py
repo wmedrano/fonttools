@@ -2619,11 +2619,13 @@ def _buildClasses():
     namespace = globals()
 
     # populate module with classes
-    for name, fields in otData:
+    for table in otData:
+        name = table.name
+        fields = table.fields
         baseClass = BaseTable
-        m = formatPat.match(name)
-        if m:
+        if table.tableFormat is not None:
             # XxxFormatN subtable, we only add the "base" table
+            m = formatPat.match(name)
             name = m.group(1)
             # the first row of a format-switching otData table describes the Format;
             # the first column defines the type of the Format field.
@@ -2638,7 +2640,8 @@ def _buildClasses():
             namespace[name] = cls
 
     # link Var{Table} <-> {Table} (e.g. ColorStop <-> VarColorStop, etc.)
-    for name, _ in otData:
+    for table in otData:
+        name = table.name
         if name.startswith("Var") and len(name) > 3 and name[3:] in namespace:
             varType = namespace[name]
             noVarType = namespace[name[3:]]
@@ -2702,12 +2705,14 @@ def _buildClasses():
     # add converters to classes
     from .otConverters import buildConverters
 
-    for name, fields in otData:
-        m = formatPat.match(name)
-        if m:
+    for table in otData:
+        name = table.name
+        fields = table.fields
+        if table.tableFormat is not None:
             # XxxFormatN subtable, add converter to "base" table
-            name, format = m.groups()
-            format = int(format)
+            m = formatPat.match(name)
+            name, _ = m.groups()
+            format = table.tableFormat
             cls = namespace[name]
             if not hasattr(cls, "converters"):
                 cls.converters = {}

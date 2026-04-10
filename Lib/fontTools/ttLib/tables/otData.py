@@ -1,11 +1,11 @@
-from .otDataSchema import FieldSpec
+from .otDataSchema import FieldSpec, TableSpec
 
 otData = [
     #
     # common
     #
-    ("LookupOrder", []),
-    (
+    TableSpec('LookupOrder', []),
+    TableSpec(
         "ScriptList",
         [
             FieldSpec("uint16", "ScriptCount", description="Number of ScriptRecords"),
@@ -16,9 +16,9 @@ otData = [
                 aux=0,
                 description="Array of ScriptRecords -listed alphabetically by ScriptTag",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ScriptRecord",
         [
             FieldSpec("Tag", "ScriptTag", description="4-byte ScriptTag identifier"),
@@ -27,9 +27,9 @@ otData = [
                 "Script",
                 description="Offset to Script table-from beginning of ScriptList",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Script",
         [
             FieldSpec(
@@ -49,9 +49,9 @@ otData = [
                 aux=0,
                 description="Array of LangSysRecords-listed alphabetically by LangSysTag",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LangSysRecord",
         [
             FieldSpec("Tag", "LangSysTag", description="4-byte LangSysTag identifier"),
@@ -60,9 +60,9 @@ otData = [
                 "LangSys",
                 description="Offset to LangSys table-from beginning of Script table",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LangSys",
         [
             FieldSpec(
@@ -87,9 +87,9 @@ otData = [
                 aux=0,
                 description="Array of indices into the FeatureList-in arbitrary order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatureList",
         [
             FieldSpec(
@@ -104,9 +104,9 @@ otData = [
                 aux=0,
                 description="Array of FeatureRecords-zero-based (first feature has FeatureIndex = 0)-listed alphabetically by FeatureTag",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatureRecord",
         [
             FieldSpec(
@@ -117,9 +117,9 @@ otData = [
                 "Feature",
                 description="Offset to Feature table-from beginning of FeatureList",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Feature",
         [
             FieldSpec(
@@ -139,10 +139,10 @@ otData = [
                 aux=0,
                 description="Array of LookupList indices for this feature -zero-based (first lookup is LookupListIndex = 0)",
             ),
-        ],
+        ]
     ),
-    ("FeatureParams", []),
-    (
+    TableSpec('FeatureParams', []),
+    TableSpec(
         "FeatureParamsSize",
         [
             FieldSpec(
@@ -166,16 +166,16 @@ otData = [
                 "RangeEnd",
                 description="Large end of recommended usage range (inclusive) in 720/inch units.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatureParamsStylisticSet",
         [
             FieldSpec("uint16", "Version", description="Set to 0."),
             FieldSpec("NameID", "UINameID", description="UI NameID."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatureParamsCharacterVariants",
         [
             FieldSpec("uint16", "Format", description="Set to 0."),
@@ -210,9 +210,9 @@ otData = [
                 aux=0,
                 description="Unicode characters for which this feature provides glyph variants.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LookupList",
         [
             FieldSpec(
@@ -225,9 +225,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to Lookup tables-from beginning of LookupList -zero based (first lookup is Lookup index = 0)",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Lookup",
         [
             FieldSpec(
@@ -254,9 +254,9 @@ otData = [
                 aux="LookupFlag & 0x0010",
                 description="If set, indicates that the lookup table structure is followed by a MarkFilteringSet field. The layout engine skips over all mark glyphs not in the mark filtering set indicated.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "CoverageFormat1",
         [
             FieldSpec(
@@ -273,8 +273,9 @@ otData = [
                 description="Array of GlyphIDs-in numerical order",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "CoverageFormat2",
         [
             FieldSpec(
@@ -289,8 +290,9 @@ otData = [
                 description="Array of glyph ranges-ordered by Start GlyphID",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "RangeRecord",
         [
             FieldSpec("GlyphID", "Start", description="First GlyphID in the range"),
@@ -300,9 +302,9 @@ otData = [
                 "StartCoverageIndex",
                 description="Coverage Index of first GlyphID in range",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ClassDefFormat1",
         [
             FieldSpec(
@@ -324,8 +326,9 @@ otData = [
                 description="Array of Class Values-one per GlyphID",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "ClassDefFormat2",
         [
             FieldSpec(
@@ -342,8 +345,9 @@ otData = [
                 description="Array of ClassRangeRecords-ordered by Start GlyphID",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "ClassRangeRecord",
         [
             FieldSpec("GlyphID", "Start", description="First GlyphID in the range"),
@@ -351,9 +355,9 @@ otData = [
             FieldSpec(
                 "uint16", "Class", description="Applied to all glyphs in the range"
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Device",
         [
             FieldSpec(
@@ -373,12 +377,12 @@ otData = [
                 aux="DeltaFormat in (1,2,3)",
                 description="Array of compressed data",
             ),
-        ],
+        ]
     ),
     #
     # gpos
     #
-    (
+    TableSpec(
         "GPOS",
         [
             FieldSpec(
@@ -407,9 +411,9 @@ otData = [
                 aux="Version >= 0x00010001",
                 description="Offset to FeatureVariations table-from beginning of GPOS table",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "SinglePosFormat1",
         [
             FieldSpec(
@@ -431,8 +435,9 @@ otData = [
                 description="Defines positioning value(s)-applied to all glyphs in the Coverage table",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "SinglePosFormat2",
         [
             FieldSpec(
@@ -457,8 +462,9 @@ otData = [
                 description="Array of ValueRecords-positioning values applied to glyphs",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "PairPosFormat1",
         [
             FieldSpec(
@@ -476,8 +482,7 @@ otData = [
             ),
             FieldSpec(
                 "uint16",
-                "ValueFormat2",
-                description="Defines the types of data in ValueRecord2-for the second glyph in the pair -may be zero (0)",
+                "ValueFormat2", description="Defines the types of data in ValueRecord2-for the second glyph in the pair -may be zero (0)",
             ),
             FieldSpec("uint16", "PairSetCount", description="Number of PairSet tables"),
             FieldSpec(
@@ -488,8 +493,9 @@ otData = [
                 description="Array of offsets to PairSet tables-from beginning of PairPos subtable-ordered by Coverage Index",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "PairSet",
         [
             FieldSpec(
@@ -502,9 +508,9 @@ otData = [
                 aux=0,
                 description="Array of PairValueRecords-ordered by GlyphID of the second glyph",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "PairValueRecord",
         [
             FieldSpec(
@@ -522,9 +528,9 @@ otData = [
                 "Value2",
                 description="Positioning data for the second glyph in the pair",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "PairPosFormat2",
         [
             FieldSpec(
@@ -542,8 +548,7 @@ otData = [
             ),
             FieldSpec(
                 "uint16",
-                "ValueFormat2",
-                description="ValueRecord definition-for the second glyph of the pair-may be zero (0)",
+                "ValueFormat2", description="ValueRecord definition-for the second glyph of the pair-may be zero (0)",
             ),
             FieldSpec(
                 "Offset",
@@ -573,8 +578,9 @@ otData = [
                 description="Array of Class1 records-ordered by Class1",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "Class1Record",
         [
             FieldSpec(
@@ -584,9 +590,9 @@ otData = [
                 aux=0,
                 description="Array of Class2 records-ordered by Class2",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Class2Record",
         [
             FieldSpec(
@@ -599,9 +605,9 @@ otData = [
                 "Value2",
                 description="Positioning for second glyph-empty if ValueFormat2 = 0",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "CursivePosFormat1",
         [
             FieldSpec(
@@ -623,8 +629,9 @@ otData = [
                 description="Array of EntryExit records-in Coverage Index order",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "EntryExitRecord",
         [
             FieldSpec(
@@ -637,9 +644,9 @@ otData = [
                 "ExitAnchor",
                 description="Offset to ExitAnchor table-from beginning of CursivePos subtable-may be NULL",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MarkBasePosFormat1",
         [
             FieldSpec(
@@ -671,8 +678,9 @@ otData = [
                 description="Offset to BaseArray table-from beginning of MarkBasePos subtable",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "BaseArray",
         [
             FieldSpec("uint16", "BaseCount", description="Number of BaseRecords"),
@@ -683,9 +691,9 @@ otData = [
                 aux=0,
                 description="Array of BaseRecords-in order of BaseCoverage Index",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseRecord",
         [
             FieldSpec(
@@ -695,9 +703,9 @@ otData = [
                 aux=0,
                 description="Array of offsets (one per class) to Anchor tables-from beginning of BaseArray table-ordered by class-zero-based",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MarkLigPosFormat1",
         [
             FieldSpec(
@@ -727,8 +735,9 @@ otData = [
                 description="Offset to LigatureArray table-from beginning of MarkLigPos subtable",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "LigatureArray",
         [
             FieldSpec(
@@ -743,9 +752,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to LigatureAttach tables-from beginning of LigatureArray table-ordered by LigatureCoverage Index",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LigatureAttach",
         [
             FieldSpec(
@@ -760,9 +769,9 @@ otData = [
                 aux=0,
                 description="Array of Component records-ordered in writing direction",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ComponentRecord",
         [
             FieldSpec(
@@ -772,9 +781,9 @@ otData = [
                 aux=0,
                 description="Array of offsets (one per class) to Anchor tables-from beginning of LigatureAttach table-ordered by class-NULL if a component does not have an attachment for a class-zero-based array",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MarkMarkPosFormat1",
         [
             FieldSpec(
@@ -806,8 +815,9 @@ otData = [
                 description="Offset to Mark2Array table for Mark2-from beginning of MarkMarkPos subtable",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "Mark2Array",
         [
             FieldSpec("uint16", "Mark2Count", description="Number of Mark2 records"),
@@ -818,9 +828,9 @@ otData = [
                 aux=0,
                 description="Array of Mark2 records-in Coverage order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Mark2Record",
         [
             FieldSpec(
@@ -830,9 +840,9 @@ otData = [
                 aux=0,
                 description="Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "PosLookupRecord",
         [
             FieldSpec(
@@ -845,9 +855,9 @@ otData = [
                 "LookupListIndex",
                 description="Lookup to apply to that position-zero-based",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ContextPosFormat1",
         [
             FieldSpec(
@@ -869,8 +879,9 @@ otData = [
                 description="Array of offsets to PosRuleSet tables-from beginning of ContextPos subtable-ordered by Coverage Index",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "PosRuleSet",
         [
             FieldSpec("uint16", "PosRuleCount", description="Number of PosRule tables"),
@@ -881,9 +892,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to PosRule tables-from beginning of PosRuleSet-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "PosRule",
         [
             FieldSpec(
@@ -906,9 +917,9 @@ otData = [
                 aux=0,
                 description="Array of positioning lookups-in design order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ContextPosFormat2",
         [
             FieldSpec(
@@ -935,8 +946,9 @@ otData = [
                 description="Array of offsets to PosClassSet tables-from beginning of ContextPos subtable-ordered by class-may be NULL",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "PosClassSet",
         [
             FieldSpec(
@@ -951,9 +963,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to PosClassRule tables-from beginning of PosClassSet-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "PosClassRule",
         [
             FieldSpec(
@@ -974,9 +986,9 @@ otData = [
                 aux=0,
                 description="Array of positioning lookups-in design order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ContextPosFormat3",
         [
             FieldSpec(
@@ -1003,8 +1015,9 @@ otData = [
                 description="Array of positioning lookups-in design order",
             ),
         ],
+        tableFormat=3
     ),
-    (
+    TableSpec(
         "ChainContextPosFormat1",
         [
             FieldSpec(
@@ -1028,8 +1041,9 @@ otData = [
                 description="Array of offsets to ChainPosRuleSet tables-from beginning of ContextPos subtable-ordered by Coverage Index",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "ChainPosRuleSet",
         [
             FieldSpec(
@@ -1044,9 +1058,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to ChainPosRule tables-from beginning of ChainPosRuleSet-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ChainPosRule",
         [
             FieldSpec(
@@ -1093,9 +1107,9 @@ otData = [
                 aux=0,
                 description="Array of PosLookupRecords (in design order)",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ChainContextPosFormat2",
         [
             FieldSpec(
@@ -1134,8 +1148,9 @@ otData = [
                 description="Array of offsets to ChainPosClassSet tables-from beginning of ChainContextPos subtable-ordered by input class-may be NULL",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "ChainPosClassSet",
         [
             FieldSpec(
@@ -1150,9 +1165,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to ChainPosClassRule tables-from beginning of ChainPosClassSet-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ChainPosClassRule",
         [
             FieldSpec(
@@ -1199,9 +1214,9 @@ otData = [
                 aux=0,
                 description="Array of PosLookupRecords (in design order)",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ChainContextPosFormat3",
         [
             FieldSpec(
@@ -1252,8 +1267,9 @@ otData = [
                 description="Array of PosLookupRecords,in design order",
             ),
         ],
+        tableFormat=3
     ),
-    (
+    TableSpec(
         "ExtensionPosFormat1",
         [
             FieldSpec(
@@ -1266,6 +1282,7 @@ otData = [
             ),
             FieldSpec("LOffset", "ExtSubTable", description="Offset to SubTable"),
         ],
+        tableFormat=1
     ),
     # 	('ValueRecord', [
     # 		('int16', 'XPlacement', None, None, 'Horizontal adjustment for placement-in design units'),
@@ -1277,7 +1294,7 @@ otData = [
     # 		('Offset', 'XAdvDevice', None, None, 'Offset to Device table for horizontal advance-measured from beginning of PosTable (may be NULL)'),
     # 		('Offset', 'YAdvDevice', None, None, 'Offset to Device table for vertical advance-measured from beginning of PosTable (may be NULL)'),
     # 	]),
-    (
+    TableSpec(
         "AnchorFormat1",
         [
             FieldSpec(
@@ -1290,8 +1307,9 @@ otData = [
                 "int16", "YCoordinate", description="Vertical value-in design units"
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "AnchorFormat2",
         [
             FieldSpec(
@@ -1307,8 +1325,9 @@ otData = [
                 "uint16", "AnchorPoint", description="Index to glyph contour point"
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "AnchorFormat3",
         [
             FieldSpec(
@@ -1331,8 +1350,9 @@ otData = [
                 description="Offset to Device table for Y coordinate- from beginning of Anchor table (may be NULL)",
             ),
         ],
+        tableFormat=3
     ),
-    (
+    TableSpec(
         "MarkArray",
         [
             FieldSpec("uint16", "MarkCount", description="Number of MarkRecords"),
@@ -1343,9 +1363,9 @@ otData = [
                 aux=0,
                 description="Array of MarkRecords-in Coverage order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MarkRecord",
         [
             FieldSpec("uint16", "Class", description="Class defined for this mark"),
@@ -1354,12 +1374,12 @@ otData = [
                 "MarkAnchor",
                 description="Offset to Anchor table-from beginning of MarkArray table",
             ),
-        ],
+        ]
     ),
     #
     # gsub
     #
-    (
+    TableSpec(
         "GSUB",
         [
             FieldSpec(
@@ -1388,9 +1408,9 @@ otData = [
                 aux="Version >= 0x00010001",
                 description="Offset to FeatureVariations table-from beginning of GSUB table",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "SingleSubstFormat1",
         [
             FieldSpec(
@@ -1407,8 +1427,9 @@ otData = [
                 description="Add to original GlyphID modulo 65536 to get substitute GlyphID",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "SingleSubstFormat2",
         [
             FieldSpec(
@@ -1432,8 +1453,9 @@ otData = [
                 description="Array of substitute GlyphIDs-ordered by Coverage Index",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "MultipleSubstFormat1",
         [
             FieldSpec(
@@ -1457,8 +1479,9 @@ otData = [
                 description="Array of offsets to Sequence tables-from beginning of Substitution table-ordered by Coverage Index",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "Sequence",
         [
             FieldSpec(
@@ -1473,9 +1496,9 @@ otData = [
                 aux=0,
                 description="String of GlyphIDs to substitute",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AlternateSubstFormat1",
         [
             FieldSpec(
@@ -1499,8 +1522,9 @@ otData = [
                 description="Array of offsets to AlternateSet tables-from beginning of Substitution table-ordered by Coverage Index",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "AlternateSet",
         [
             FieldSpec(
@@ -1515,9 +1539,9 @@ otData = [
                 aux=0,
                 description="Array of alternate GlyphIDs-in arbitrary order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LigatureSubstFormat1",
         [
             FieldSpec(
@@ -1539,8 +1563,9 @@ otData = [
                 description="Array of offsets to LigatureSet tables-from beginning of Substitution table-ordered by Coverage Index",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "LigatureSet",
         [
             FieldSpec(
@@ -1553,9 +1578,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to Ligature tables-from beginning of LigatureSet table-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Ligature",
         [
             FieldSpec(
@@ -1573,9 +1598,9 @@ otData = [
                 aux=-1,
                 description="Array of component GlyphIDs-start with the second component-ordered in writing direction",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "SubstLookupRecord",
         [
             FieldSpec(
@@ -1588,9 +1613,9 @@ otData = [
                 "LookupListIndex",
                 description="Lookup to apply to that position-zero-based",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ContextSubstFormat1",
         [
             FieldSpec(
@@ -1614,8 +1639,9 @@ otData = [
                 description="Array of offsets to SubRuleSet tables-from beginning of Substitution table-ordered by Coverage Index",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "SubRuleSet",
         [
             FieldSpec("uint16", "SubRuleCount", description="Number of SubRule tables"),
@@ -1626,9 +1652,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to SubRule tables-from beginning of SubRuleSet table-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "SubRule",
         [
             FieldSpec(
@@ -1653,9 +1679,9 @@ otData = [
                 aux=0,
                 description="Array of SubstLookupRecords-in design order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ContextSubstFormat2",
         [
             FieldSpec(
@@ -1682,8 +1708,9 @@ otData = [
                 description="Array of offsets to SubClassSet tables-from beginning of Substitution table-ordered by class-may be NULL",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "SubClassSet",
         [
             FieldSpec(
@@ -1698,9 +1725,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to SubClassRule tables-from beginning of SubClassSet-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "SubClassRule",
         [
             FieldSpec(
@@ -1725,9 +1752,9 @@ otData = [
                 aux=0,
                 description="Array of Substitution lookups-in design order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ContextSubstFormat3",
         [
             FieldSpec(
@@ -1756,8 +1783,9 @@ otData = [
                 description="Array of SubstLookupRecords-in design order",
             ),
         ],
+        tableFormat=3
     ),
-    (
+    TableSpec(
         "ChainContextSubstFormat1",
         [
             FieldSpec(
@@ -1781,8 +1809,9 @@ otData = [
                 description="Array of offsets to ChainSubRuleSet tables-from beginning of Substitution table-ordered by Coverage Index",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "ChainSubRuleSet",
         [
             FieldSpec(
@@ -1797,9 +1826,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to ChainSubRule tables-from beginning of ChainSubRuleSet table-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ChainSubRule",
         [
             FieldSpec(
@@ -1848,9 +1877,9 @@ otData = [
                 aux=0,
                 description="Array of SubstLookupRecords (in design order)",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ChainContextSubstFormat2",
         [
             FieldSpec(
@@ -1889,8 +1918,9 @@ otData = [
                 description="Array of offsets to ChainSubClassSet tables-from beginning of Substitution table-ordered by input class-may be NULL",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "ChainSubClassSet",
         [
             FieldSpec(
@@ -1905,9 +1935,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to ChainSubClassRule tables-from beginning of ChainSubClassSet-ordered by preference",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ChainSubClassRule",
         [
             FieldSpec(
@@ -1956,9 +1986,9 @@ otData = [
                 aux=0,
                 description="Array of SubstLookupRecords (in design order)",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ChainContextSubstFormat3",
         [
             FieldSpec(
@@ -2011,8 +2041,9 @@ otData = [
                 description="Array of SubstLookupRecords, in design order",
             ),
         ],
+        tableFormat=3
     ),
-    (
+    TableSpec(
         "ExtensionSubstFormat1",
         [
             FieldSpec(
@@ -2029,8 +2060,9 @@ otData = [
                 description="Array of offsets to Lookup tables-from beginning of LookupList -zero based (first lookup is Lookup index = 0)",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "ReverseChainSingleSubstFormat1",
         [
             FieldSpec(
@@ -2079,11 +2111,12 @@ otData = [
                 description="Array of substitute GlyphIDs-ordered by Coverage index",
             ),
         ],
+        tableFormat=1
     ),
     #
     # gdef
     #
-    (
+    TableSpec(
         "GDEF",
         [
             FieldSpec(
@@ -2123,9 +2156,9 @@ otData = [
                 aux="Version >= 0x00010003",
                 description="Offset to variation store (may be NULL)",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AttachList",
         [
             FieldSpec(
@@ -2145,9 +2178,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to AttachPoint tables-from beginning of AttachList table-in Coverage Index order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AttachPoint",
         [
             FieldSpec(
@@ -2162,9 +2195,9 @@ otData = [
                 aux=0,
                 description="Array of contour point indices -in increasing numerical order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LigCaretList",
         [
             FieldSpec(
@@ -2182,9 +2215,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to LigGlyph tables-from beginning of LigCaretList table-in Coverage Index order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LigGlyph",
         [
             FieldSpec(
@@ -2199,9 +2232,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to CaretValue tables-from beginning of LigGlyph table-in increasing coordinate order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "CaretValueFormat1",
         [
             FieldSpec(
@@ -2211,8 +2244,9 @@ otData = [
                 "int16", "Coordinate", description="X or Y value, in design units"
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "CaretValueFormat2",
         [
             FieldSpec(
@@ -2222,8 +2256,9 @@ otData = [
                 "uint16", "CaretValuePoint", description="Contour point index on glyph"
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "CaretValueFormat3",
         [
             FieldSpec(
@@ -2238,8 +2273,9 @@ otData = [
                 description="Offset to Device table for X or Y value-from beginning of CaretValue table",
             ),
         ],
+        tableFormat=3
     ),
-    (
+    TableSpec(
         "MarkGlyphSetsDef",
         [
             FieldSpec(
@@ -2255,12 +2291,12 @@ otData = [
                 aux=0,
                 description="Array of offsets to mark set coverage tables.",
             ),
-        ],
+        ]
     ),
     #
     # base
     #
-    (
+    TableSpec(
         "BASE",
         [
             FieldSpec(
@@ -2284,9 +2320,9 @@ otData = [
                 aux="Version >= 0x00010001",
                 description="Offset to variation store (may be NULL)",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Axis",
         [
             FieldSpec(
@@ -2299,9 +2335,9 @@ otData = [
                 "BaseScriptList",
                 description="Offset to BaseScriptList table-from beginning of Axis table",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseTagList",
         [
             FieldSpec(
@@ -2316,9 +2352,9 @@ otData = [
                 aux=0,
                 description="Array of 4-byte baseline identification tags-must be in alphabetical order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseScriptList",
         [
             FieldSpec(
@@ -2333,9 +2369,9 @@ otData = [
                 aux=0,
                 description="Array of BaseScriptRecords-in alphabetical order by BaseScriptTag",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseScriptRecord",
         [
             FieldSpec(
@@ -2346,9 +2382,9 @@ otData = [
                 "BaseScript",
                 description="Offset to BaseScript table-from beginning of BaseScriptList",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseScript",
         [
             FieldSpec(
@@ -2373,9 +2409,9 @@ otData = [
                 aux=0,
                 description="Array of BaseLangSysRecords-in alphabetical order by BaseLangSysTag",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseLangSysRecord",
         [
             FieldSpec(
@@ -2388,9 +2424,9 @@ otData = [
                 "MinMax",
                 description="Offset to MinMax table-from beginning of BaseScript table",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseValues",
         [
             FieldSpec(
@@ -2410,9 +2446,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to BaseCoord-from beginning of BaseValues table-order matches BaselineTag array in the BaseTagList",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MinMax",
         [
             FieldSpec(
@@ -2437,9 +2473,9 @@ otData = [
                 aux=0,
                 description="Array of FeatMinMaxRecords-in alphabetical order, by FeatureTableTag",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatMinMaxRecord",
         [
             FieldSpec(
@@ -2457,9 +2493,9 @@ otData = [
                 "MaxCoord",
                 description="Offset to BaseCoord table-defines maximum extent value-from beginning of MinMax table-may be NULL",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseCoordFormat1",
         [
             FieldSpec(
@@ -2469,8 +2505,9 @@ otData = [
                 "int16", "Coordinate", description="X or Y value, in design units"
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "BaseCoordFormat2",
         [
             FieldSpec(
@@ -2488,8 +2525,9 @@ otData = [
                 description="Index of contour point on the ReferenceGlyph",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "BaseCoordFormat3",
         [
             FieldSpec(
@@ -2504,11 +2542,12 @@ otData = [
                 description="Offset to Device table for X or Y value",
             ),
         ],
+        tableFormat=3
     ),
     #
     # jstf
     #
-    (
+    TableSpec(
         "JSTF",
         [
             FieldSpec(
@@ -2528,9 +2567,9 @@ otData = [
                 aux=0,
                 description="Array of JstfScriptRecords-in alphabetical order, by JstfScriptTag",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "JstfScriptRecord",
         [
             FieldSpec(
@@ -2541,9 +2580,9 @@ otData = [
                 "JstfScript",
                 description="Offset to JstfScript table-from beginning of JSTF Header",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "JstfScript",
         [
             FieldSpec(
@@ -2568,9 +2607,9 @@ otData = [
                 aux=0,
                 description="Array of JstfLangSysRecords-in alphabetical order, by JstfLangSysTag",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "JstfLangSysRecord",
         [
             FieldSpec(
@@ -2581,9 +2620,9 @@ otData = [
                 "JstfLangSys",
                 description="Offset to JstfLangSys table-from beginning of JstfScript table",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ExtenderGlyph",
         [
             FieldSpec(
@@ -2598,9 +2637,9 @@ otData = [
                 aux=0,
                 description="GlyphIDs-in increasing numerical order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "JstfLangSys",
         [
             FieldSpec(
@@ -2615,9 +2654,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to JstfPriority tables-from beginning of JstfLangSys table-in priority order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "JstfPriority",
         [
             FieldSpec(
@@ -2670,9 +2709,9 @@ otData = [
                 "ExtensionJstfMax",
                 description="Offset to Extension JstfMax table-from beginning of JstfPriority table -may be NULL",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "JstfGSUBModList",
         [
             FieldSpec(
@@ -2687,9 +2726,9 @@ otData = [
                 aux=0,
                 description="Array of LookupIndex identifiers in GSUB-in increasing numerical order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "JstfGPOSModList",
         [
             FieldSpec(
@@ -2704,9 +2743,9 @@ otData = [
                 aux=0,
                 description="Array of LookupIndex identifiers in GPOS-in increasing numerical order",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "JstfMax",
         [
             FieldSpec(
@@ -2721,12 +2760,12 @@ otData = [
                 aux=0,
                 description="Array of offsets to GPOS-type lookup tables-from beginning of JstfMax table-in design order",
             ),
-        ],
+        ]
     ),
     #
     # STAT
     #
-    (
+    TableSpec(
         "STAT",
         [
             FieldSpec(
@@ -2761,9 +2800,9 @@ otData = [
                 aux="Version >= 0x00010001",
                 description="NameID to use when all style attributes are elided.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AxisRecordArray",
         [
             FieldSpec(
@@ -2773,9 +2812,9 @@ otData = [
                 aux=0,
                 description="Axis records",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AxisRecord",
         [
             FieldSpec(
@@ -2800,9 +2839,9 @@ otData = [
                 aux=-8,
                 description="Extra bytes.  Set to empty array.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AxisValueArray",
         [
             FieldSpec(
@@ -2812,9 +2851,9 @@ otData = [
                 aux=0,
                 description="Axis values",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AxisValueFormat1",
         [
             FieldSpec("uint16", "Format", description="Format, = 1"),
@@ -2827,8 +2866,9 @@ otData = [
             FieldSpec("NameID", "ValueNameID"),
             FieldSpec("Fixed", "Value"),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "AxisValueFormat2",
         [
             FieldSpec("uint16", "Format", description="Format, = 2"),
@@ -2843,8 +2883,9 @@ otData = [
             FieldSpec("Fixed", "RangeMinValue"),
             FieldSpec("Fixed", "RangeMaxValue"),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "AxisValueFormat3",
         [
             FieldSpec("uint16", "Format", description="Format, = 3"),
@@ -2858,8 +2899,9 @@ otData = [
             FieldSpec("Fixed", "Value"),
             FieldSpec("Fixed", "LinkedValue"),
         ],
+        tableFormat=3
     ),
-    (
+    TableSpec(
         "AxisValueFormat4",
         [
             FieldSpec("uint16", "Format", description="Format, = 4"),
@@ -2878,8 +2920,9 @@ otData = [
                 description="Array of AxisValue records that provide the combination of axis values, one for each contributing axis. ",
             ),
         ],
+        tableFormat=4
     ),
-    (
+    TableSpec(
         "AxisValueRecord",
         [
             FieldSpec(
@@ -2892,13 +2935,13 @@ otData = [
                 "Value",
                 description="A numeric value for this attribute value.",
             ),
-        ],
+        ]
     ),
     #
     # Variation fonts
     #
     # GSUB/GPOS FeatureVariations
-    (
+    TableSpec(
         "FeatureVariations",
         [
             FieldSpec(
@@ -2918,9 +2961,9 @@ otData = [
                 aux=0,
                 description="Array of FeatureVariationRecord",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatureVariationRecord",
         [
             FieldSpec(
@@ -2933,9 +2976,9 @@ otData = [
                 "FeatureTableSubstitution",
                 description="Offset to a FeatureTableSubstitution table, from beginning of the FeatureVariations table",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ConditionList",
         [
             FieldSpec(
@@ -2950,9 +2993,9 @@ otData = [
                 aux=0,
                 description="Array of offset to condition tables, from the beginning of the ConditionList table.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ConditionSet",
         [
             FieldSpec(
@@ -2967,9 +3010,9 @@ otData = [
                 aux=0,
                 description="Array of offset to condition tables, from the beginning of the ConditionSet table.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ConditionTableFormat1",
         [
             FieldSpec("uint16", "Format", description="Format, = 1"),
@@ -2989,8 +3032,9 @@ otData = [
                 description="Maximum value that satisfies this condition.",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "ConditionTableFormat2",
         [
             FieldSpec("uint16", "Format", description="Format, = 2"),
@@ -3003,8 +3047,9 @@ otData = [
                 description="Variation index to vary the value based on current designspace location.",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "ConditionTableFormat3",
         [
             FieldSpec("uint16", "Format", description="Format, = 3"),
@@ -3021,8 +3066,9 @@ otData = [
                 description="Array of condition tables for this conjunction (AND) expression.",
             ),
         ],
+        tableFormat=3
     ),
-    (
+    TableSpec(
         "ConditionTableFormat4",
         [
             FieldSpec("uint16", "Format", description="Format, = 4"),
@@ -3039,15 +3085,17 @@ otData = [
                 description="Array of condition tables for this disjunction (OR) expression.",
             ),
         ],
+        tableFormat=4
     ),
-    (
+    TableSpec(
         "ConditionTableFormat5",
         [
             FieldSpec("uint16", "Format", description="Format, = 5"),
             FieldSpec("Offset24", "ConditionTable", description="Condition to negate."),
         ],
+        tableFormat=5
     ),
-    (
+    TableSpec(
         "FeatureTableSubstitution",
         [
             FieldSpec(
@@ -3067,9 +3115,9 @@ otData = [
                 aux=0,
                 description="Array of FeatureTableSubstitutionRecord",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatureTableSubstitutionRecord",
         [
             FieldSpec(
@@ -3082,32 +3130,32 @@ otData = [
                 "Feature",
                 description="Offset to an alternate feature table, from start of the FeatureTableSubstitution table.",
             ),
-        ],
+        ]
     ),
     # VariationStore
-    (
+    TableSpec(
         "VarRegionAxis",
         [
             FieldSpec("F2Dot14", "StartCoord"),
             FieldSpec("F2Dot14", "PeakCoord"),
             FieldSpec("F2Dot14", "EndCoord"),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VarRegion",
         [
             FieldSpec("struct", "VarRegionAxis", repeat="RegionAxisCount", aux=0),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VarRegionList",
         [
             FieldSpec("uint16", "RegionAxisCount"),
             FieldSpec("uint16", "RegionCount"),
             FieldSpec("VarRegion", "Region", repeat="RegionCount", aux=0),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VarData",
         [
             FieldSpec("uint16", "ItemCount"),
@@ -3115,19 +3163,19 @@ otData = [
             FieldSpec("uint16", "VarRegionCount"),
             FieldSpec("uint16", "VarRegionIndex", repeat="VarRegionCount", aux=0),
             FieldSpec("VarDataValue", "Item", repeat="ItemCount", aux=0),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VarStore",
         [
             FieldSpec("uint16", "Format", description="Set to 1."),
             FieldSpec("LOffset", "VarRegionList"),
             FieldSpec("uint16", "VarDataCount"),
             FieldSpec("LOffset", "VarData", repeat="VarDataCount", aux=0),
-        ],
+        ]
     ),
     # Variation helpers
-    (
+    TableSpec(
         "VarIdxMap",
         [
             FieldSpec("uint16", "EntryFormat"),  # Automatically computed
@@ -3139,9 +3187,9 @@ otData = [
                 aux=0,
                 description="Array of compressed data",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "DeltaSetIndexMapFormat0",
         [
             FieldSpec(
@@ -3157,8 +3205,9 @@ otData = [
                 description="Array of compressed data",
             ),
         ],
+        tableFormat=0
     ),
-    (
+    TableSpec(
         "DeltaSetIndexMapFormat1",
         [
             FieldSpec(
@@ -3174,55 +3223,56 @@ otData = [
                 description="Array of compressed data",
             ),
         ],
+        tableFormat=1
     ),
     # MultiVariationStore
-    (
+    TableSpec(
         "SparseVarRegionAxis",
         [
             FieldSpec("uint16", "AxisIndex"),
             FieldSpec("F2Dot14", "StartCoord"),
             FieldSpec("F2Dot14", "PeakCoord"),
             FieldSpec("F2Dot14", "EndCoord"),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "SparseVarRegion",
         [
             FieldSpec("uint16", "SparseRegionCount"),
             FieldSpec(
                 "struct", "SparseVarRegionAxis", repeat="SparseRegionCount", aux=0
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "SparseVarRegionList",
         [
             FieldSpec("uint16", "RegionCount"),
             FieldSpec(
                 "LOffsetTo(SparseVarRegion)", "Region", repeat="RegionCount", aux=0
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MultiVarData",
         [
             FieldSpec("uint8", "Format", description="Set to 1."),
             FieldSpec("uint16", "VarRegionCount"),
             FieldSpec("uint16", "VarRegionIndex", repeat="VarRegionCount", aux=0),
             FieldSpec("TupleList", "Item", repeat="", aux=0),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MultiVarStore",
         [
             FieldSpec("uint16", "Format", description="Set to 1."),
             FieldSpec("LOffset", "SparseVarRegionList"),
             FieldSpec("uint16", "MultiVarDataCount"),
             FieldSpec("LOffset", "MultiVarData", repeat="MultiVarDataCount", aux=0),
-        ],
+        ]
     ),
     # VariableComposites
-    (
+    TableSpec(
         "VARC",
         [
             FieldSpec(
@@ -3235,22 +3285,22 @@ otData = [
             FieldSpec("LOffset", "ConditionList", description="(may be NULL)"),
             FieldSpec("LOffset", "AxisIndicesList", description="(may be NULL)"),
             FieldSpec("LOffset", "VarCompositeGlyphs"),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AxisIndicesList",
         [
             FieldSpec("TupleList", "Item", repeat="", aux=0),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VarCompositeGlyphs",
         [
             FieldSpec("VarCompositeGlyphList", "VarCompositeGlyph", repeat=""),
-        ],
+        ]
     ),
     # Glyph advance variations
-    (
+    TableSpec(
         "HVAR",
         [
             FieldSpec(
@@ -3262,9 +3312,9 @@ otData = [
             FieldSpec("LOffsetTo(VarIdxMap)", "AdvWidthMap"),
             FieldSpec("LOffsetTo(VarIdxMap)", "LsbMap"),
             FieldSpec("LOffsetTo(VarIdxMap)", "RsbMap"),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VVAR",
         [
             FieldSpec(
@@ -3281,10 +3331,10 @@ otData = [
                 "VOrgMap",
                 description="Vertical origin mapping.",
             ),
-        ],
+        ]
     ),
     # Font-wide metrics variations
-    (
+    TableSpec(
         "MetricsValueRecord",
         [
             FieldSpec(
@@ -3300,9 +3350,9 @@ otData = [
                 aux=-8,
                 description="Extra bytes.  Set to empty array.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MVAR",
         [
             FieldSpec(
@@ -3317,12 +3367,12 @@ otData = [
             FieldSpec(
                 "MetricsValueRecord", "ValueRecord", repeat="ValueRecordCount", aux=0
             ),
-        ],
+        ]
     ),
     #
     # math
     #
-    (
+    TableSpec(
         "MATH",
         [
             FieldSpec(
@@ -3345,9 +3395,9 @@ otData = [
                 "MathVariants",
                 description="Offset to MathVariants table - from the beginning of MATH table.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathValueRecord",
         [
             FieldSpec(
@@ -3358,9 +3408,9 @@ otData = [
                 "DeviceTable",
                 description="Offset to the device table - from the beginning of parent table. May be NULL. Suggested format for device table is 1.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathConstants",
         [
             FieldSpec(
@@ -3641,9 +3691,9 @@ otData = [
                 "RadicalDegreeBottomRaisePercent",
                 description="Height of the bottom of the radical degree, if such is present, in proportion to the ascender of the radical sign. Suggested: 60%.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathGlyphInfo",
         [
             FieldSpec(
@@ -3666,9 +3716,9 @@ otData = [
                 "MathKernInfo",
                 description="Offset to MathKernInfo table - from the beginning of MathGlyphInfo table.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathItalicsCorrectionInfo",
         [
             FieldSpec(
@@ -3688,9 +3738,9 @@ otData = [
                 aux=0,
                 description="Array of MathValueRecords defining italics correction values for each covered glyph.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathTopAccentAttachment",
         [
             FieldSpec(
@@ -3710,9 +3760,9 @@ otData = [
                 aux=0,
                 description="Array of MathValueRecords defining top accent attachment points for each covered glyph",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathKernInfo",
         [
             FieldSpec(
@@ -3730,9 +3780,9 @@ otData = [
                 aux=0,
                 description="Array of MathKernInfoRecords, per-glyph information for mathematical positioning of subscripts and superscripts.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathKernInfoRecord",
         [
             FieldSpec(
@@ -3755,9 +3805,9 @@ otData = [
                 "BottomLeftMathKern",
                 description="Offset to MathKern table for bottom left corner - from the beginning of MathKernInfo table. May be NULL.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathKern",
         [
             FieldSpec(
@@ -3779,9 +3829,9 @@ otData = [
                 aux=1,
                 description="Array of kern values corresponding to heights. First value is the kern value for all heights less or equal than the first height in this table.Last value is the value to be applied for all heights greater than the last height in this table. Negative values are interpreted as move glyphs closer to each other.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathVariants",
         [
             FieldSpec(
@@ -3823,9 +3873,9 @@ otData = [
                 aux=0,
                 description="Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathGlyphConstruction",
         [
             FieldSpec(
@@ -3845,9 +3895,9 @@ otData = [
                 aux=0,
                 description="MathGlyphVariantRecords for alternative variants of the glyphs.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MathGlyphVariantRecord",
         [
             FieldSpec(
@@ -3858,9 +3908,9 @@ otData = [
                 "AdvanceMeasurement",
                 description="Advance width/height, in design units, of the variant, in the direction of requested glyph extension.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "GlyphAssembly",
         [
             FieldSpec(
@@ -3878,9 +3928,9 @@ otData = [
                 aux=0,
                 description="Array of part records, from left to right and bottom to top.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "GlyphPartRecord",
         [
             FieldSpec("GlyphID", "glyph", description="Glyph ID for the part."),
@@ -3904,12 +3954,12 @@ otData = [
                 "PartFlags",
                 description="Part qualifiers. PartFlags enumeration currently uses only one bit: 0x0001 fExtender: If set, the part can be skipped or repeated. 0xFFFE Reserved",
             ),
-        ],
+        ]
     ),
     ##
     ## Apple Advanced Typography (AAT) tables
     ##
-    (
+    TableSpec(
         "AATLookupSegment",
         [
             FieldSpec(
@@ -3923,24 +3973,23 @@ otData = [
                 "value",
                 description="A 16-bit offset from the start of the table to the data.",
             ),
-        ],
+        ]
     ),
     #
     # ankr
     #
-    (
+    TableSpec(
         "ankr",
         [
             FieldSpec("struct", "AnchorPoints", description="Anchor points table."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AnchorPointsFormat0",
         [
             FieldSpec(
                 "uint16",
-                "Format",
-                description="Format of the anchor points table, = 0.",
+                "Format", description="Format of the anchor points table, = 0.",
             ),
             FieldSpec(
                 "uint16", "Flags", description="Flags. Currenty unused, set to zero."
@@ -3951,8 +4000,9 @@ otData = [
                 description="Table of with anchor overrides for each glyph.",
             ),
         ],
+        tableFormat=0
     ),
-    (
+    TableSpec(
         "AnchorGlyphData",
         [
             FieldSpec(
@@ -3967,9 +4017,9 @@ otData = [
                 aux=0,
                 description="Individual anchor points.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AnchorPoint",
         [
             FieldSpec(
@@ -3978,12 +4028,12 @@ otData = [
             FieldSpec(
                 "int16", "YCoordinate", description="Y coordinate of this anchor point."
             ),
-        ],
+        ]
     ),
     #
     # bsln
     #
-    (
+    TableSpec(
         "bsln",
         [
             FieldSpec(
@@ -3992,9 +4042,9 @@ otData = [
                 description="Version number of the AAT baseline table (0x00010000 for the initial version).",
             ),
             FieldSpec("struct", "Baseline", description="Baseline table."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaselineFormat0",
         [
             FieldSpec(
@@ -4013,8 +4063,9 @@ otData = [
                 description="These are the FUnit distance deltas from the font’s natural baseline to the other baselines used in the font. A total of 32 deltas must be assigned.",
             ),
         ],
+        tableFormat=0
     ),
-    (
+    TableSpec(
         "BaselineFormat1",
         [
             FieldSpec(
@@ -4038,8 +4089,9 @@ otData = [
                 description="Lookup table that maps glyphs to their baseline values.",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "BaselineFormat2",
         [
             FieldSpec(
@@ -4063,8 +4115,9 @@ otData = [
                 description="Array of 32 control point numbers, associated with the standard glyph. A value of 0xFFFF means there is no corresponding control point in the standard glyph.",
             ),
         ],
+        tableFormat=2
     ),
-    (
+    TableSpec(
         "BaselineFormat3",
         [
             FieldSpec(
@@ -4093,25 +4146,25 @@ otData = [
                 description="Lookup table that maps glyphs to their baseline values.",
             ),
         ],
+        tableFormat=3
     ),
     #
     # cidg
     #
-    (
+    TableSpec(
         "cidg",
         [
             FieldSpec(
                 "struct", "CIDGlyphMapping", description="CID-to-glyph mapping table."
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "CIDGlyphMappingFormat0",
         [
             FieldSpec(
                 "uint16",
-                "Format",
-                description="Format of the CID-to-glyph mapping table, = 0.",
+                "Format", description="Format of the CID-to-glyph mapping table, = 0.",
             ),
             FieldSpec(
                 "uint16", "DataFormat", description="Currenty unused, set to zero."
@@ -4140,11 +4193,12 @@ otData = [
                 description="A mapping from CIDs to the glyphs in the font, starting with CID 0. If a CID from the identified collection has no glyph in the font, 0xFFFF is used",
             ),
         ],
+        tableFormat=0
     ),
     #
     # feat
     #
-    (
+    TableSpec(
         "feat",
         [
             FieldSpec(
@@ -4153,9 +4207,9 @@ otData = [
                 description="Version of the feat table-initially set to 0x00010000.",
             ),
             FieldSpec("FeatureNames", "FeatureNames", description="The feature names."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatureNames",
         [
             FieldSpec(
@@ -4172,9 +4226,9 @@ otData = [
                 aux=0,
                 description="The feature name array.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "FeatureName",
         [
             FieldSpec("uint16", "FeatureType", description="Feature type."),
@@ -4198,9 +4252,9 @@ otData = [
                 "FeatureNameID",
                 description="The name table index for the feature name.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Settings",
         [
             FieldSpec(
@@ -4210,9 +4264,9 @@ otData = [
                 aux=0,
                 description="The setting array.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "Setting",
         [
             FieldSpec("uint16", "SettingValue", description="The setting."),
@@ -4221,26 +4275,25 @@ otData = [
                 "SettingNameID",
                 description="The name table index for the setting name.",
             ),
-        ],
+        ]
     ),
     #
     # gcid
     #
-    (
+    TableSpec(
         "gcid",
         [
             FieldSpec(
                 "struct", "GlyphCIDMapping", description="Glyph to CID mapping table."
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "GlyphCIDMappingFormat0",
         [
             FieldSpec(
                 "uint16",
-                "Format",
-                description="Format of the glyph-to-CID mapping table, = 0.",
+                "Format", description="Format of the glyph-to-CID mapping table, = 0.",
             ),
             FieldSpec(
                 "uint16", "DataFormat", description="Currenty unused, set to zero."
@@ -4269,11 +4322,12 @@ otData = [
                 description="The CIDs for the glyphs in the font, starting with glyph 0. If a glyph does not correspond to a CID in the identified collection, 0xFFFF is used",
             ),
         ],
+        tableFormat=0
     ),
     #
     # lcar
     #
-    (
+    TableSpec(
         "lcar",
         [
             FieldSpec(
@@ -4282,15 +4336,14 @@ otData = [
                 description="Version number of the ligature caret table (0x00010000 for the initial version).",
             ),
             FieldSpec("struct", "LigatureCarets", description="Ligature carets table."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LigatureCaretsFormat0",
         [
             FieldSpec(
                 "uint16",
-                "Format",
-                description="Format of the ligature caret table. Format 0 indicates division points are distances in font units, Format 1 indicates division points are indexes of control points.",
+                "Format", description="Format of the ligature caret table. Format 0 indicates division points are distances in font units, Format 1 indicates division points are indexes of control points.",
             ),
             FieldSpec(
                 "AATLookup(LigCaretDistances)",
@@ -4298,14 +4351,14 @@ otData = [
                 description="Lookup table associating ligature glyphs with their caret positions, in font unit distances.",
             ),
         ],
+        tableFormat=0
     ),
-    (
+    TableSpec(
         "LigatureCaretsFormat1",
         [
             FieldSpec(
                 "uint16",
-                "Format",
-                description="Format of the ligature caret table. Format 0 indicates division points are distances in font units, Format 1 indicates division points are indexes of control points.",
+                "Format", description="Format of the ligature caret table. Format 0 indicates division points are distances in font units, Format 1 indicates division points are indexes of control points.",
             ),
             FieldSpec(
                 "AATLookup(LigCaretPoints)",
@@ -4313,8 +4366,9 @@ otData = [
                 description="Lookup table associating ligature glyphs with their caret positions, as control points.",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "LigCaretDistances",
         [
             FieldSpec(
@@ -4327,9 +4381,9 @@ otData = [
                 aux=0,
                 description="Distance in font units through which a subdivision is made orthogonally to the baseline.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LigCaretPoints",
         [
             FieldSpec(
@@ -4342,12 +4396,12 @@ otData = [
                 aux=0,
                 description="The number of the control point through which a subdivision is made orthogonally to the baseline.",
             ),
-        ],
+        ]
     ),
     #
     # mort
     #
-    (
+    TableSpec(
         "mort",
         [
             FieldSpec("Version", "Version", description="Version of the mort table."),
@@ -4363,9 +4417,9 @@ otData = [
                 aux=0,
                 description="Array of metamorphosis chains.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MortChain",
         [
             FieldSpec(
@@ -4402,9 +4456,9 @@ otData = [
                 aux=0,
                 description="Array of metamorphosis subtables.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MortSubtable",
         [
             FieldSpec(
@@ -4424,12 +4478,12 @@ otData = [
                 description="The 32-bit mask identifying which subtable this is (the subtable being executed if the AND of this value and the processed defaultFlags is nonzero).",
             ),
             FieldSpec("SubStruct", "SubStruct", description="SubTable."),
-        ],
+        ]
     ),
     #
     # morx
     #
-    (
+    TableSpec(
         "morx",
         [
             FieldSpec("uint16", "Version", description="Version of the morx table."),
@@ -4446,9 +4500,9 @@ otData = [
                 aux=0,
                 description="Array of extended metamorphosis chains.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MorxChain",
         [
             FieldSpec(
@@ -4485,9 +4539,9 @@ otData = [
                 aux=0,
                 description="Array of extended metamorphosis subtables.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MorphFeature",
         [
             FieldSpec("uint16", "FeatureType", description="The type of feature."),
@@ -4506,12 +4560,12 @@ otData = [
                 "DisableFlags",
                 description="Complement of flags for the settings that this feature and setting disable.",
             ),
-        ],
+        ]
     ),
     # Apple TrueType Reference Manual, chapter “The ‘morx’ table”,
     # section “Metamorphosis Subtables”.
     # https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6morx.html
-    (
+    TableSpec(
         "MorxSubtable",
         [
             FieldSpec(
@@ -4532,9 +4586,9 @@ otData = [
                 description="The 32-bit mask identifying which subtable this is (the subtable being executed if the AND of this value and the processed defaultFlags is nonzero).",
             ),
             FieldSpec("SubStruct", "SubStruct", description="SubTable."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "StateHeader",
         [
             FieldSpec(
@@ -4557,9 +4611,9 @@ otData = [
                 "EntryTableOffset",
                 description="Offset from the start of this state table header to the start of the entry table.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "RearrangementMorph",
         [
             FieldSpec(
@@ -4567,9 +4621,9 @@ otData = [
                 "StateTable",
                 description="Finite-state transducer table for indic rearrangement.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ContextualMorph",
         [
             FieldSpec(
@@ -4577,9 +4631,9 @@ otData = [
                 "StateTable",
                 description="Finite-state transducer for contextual glyph substitution.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LigatureMorph",
         [
             FieldSpec(
@@ -4587,9 +4641,9 @@ otData = [
                 "StateTable",
                 description="Finite-state transducer for ligature substitution.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "NoncontextualMorph",
         [
             FieldSpec(
@@ -4597,9 +4651,9 @@ otData = [
                 "Substitution",
                 description="The noncontextual glyph substitution table.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "InsertionMorph",
         [
             FieldSpec(
@@ -4607,9 +4661,9 @@ otData = [
                 "StateTable",
                 description="Finite-state transducer for glyph insertion.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "MorphClass",
         [
             FieldSpec(
@@ -4619,14 +4673,14 @@ otData = [
             ),
             # ('uint16', 'GlyphCount', None, None, 'Number of glyphs in class table.'),
             # ('uint8', 'GlyphClass', 'GlyphCount', 0, 'The class codes (indexed by glyph index minus firstGlyph). Class codes range from 0 to the value of stateSize minus 1.'),
-        ],
+        ]
     ),
     # If the 'morx' table version is 3 or greater, then the last subtable in the chain is followed by a subtableGlyphCoverageArray, as described below.
     # 		('Offset', 'MarkGlyphSetsDef', None, 'round(Version*0x10000) >= 0x00010002', 'Offset to the table of mark set definitions-from beginning of GDEF header (may be NULL)'),
     #
     # prop
     #
-    (
+    TableSpec(
         "prop",
         [
             FieldSpec(
@@ -4635,9 +4689,9 @@ otData = [
                 description="Version number of the AAT glyphs property table. Version 1.0 is the initial table version. Version 2.0, which is recognized by macOS 8.5 and later, adds support for the “attaches on right” bit. Version 3.0, which gets recognized by macOS X and iOS, adds support for the additional directional properties defined in Unicode 3.0.",
             ),
             FieldSpec("struct", "GlyphProperties", description="Glyph properties."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "GlyphPropertiesFormat0",
         [
             FieldSpec("uint16", "Format", description="Format, = 0."),
@@ -4647,8 +4701,9 @@ otData = [
                 description="Default properties applied to a glyph. Since there is no lookup table in prop format 0, the default properties get applied to every glyph in the font.",
             ),
         ],
+        tableFormat=0
     ),
-    (
+    TableSpec(
         "GlyphPropertiesFormat1",
         [
             FieldSpec("uint16", "Format", description="Format, = 1."),
@@ -4663,11 +4718,12 @@ otData = [
                 description="Lookup data associating glyphs with their properties.",
             ),
         ],
+        tableFormat=1
     ),
     #
     # opbd
     #
-    (
+    TableSpec(
         "opbd",
         [
             FieldSpec(
@@ -4676,15 +4732,14 @@ otData = [
                 description="Version number of the optical bounds table (0x00010000 for the initial version).",
             ),
             FieldSpec("struct", "OpticalBounds", description="Optical bounds table."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "OpticalBoundsFormat0",
         [
             FieldSpec(
                 "uint16",
-                "Format",
-                description="Format of the optical bounds table, = 0.",
+                "Format", description="Format of the optical bounds table, = 0.",
             ),
             FieldSpec(
                 "AATLookup(OpticalBoundsDeltas)",
@@ -4692,14 +4747,14 @@ otData = [
                 description="Lookup table associating glyphs with their optical bounds, given as deltas in font units.",
             ),
         ],
+        tableFormat=0
     ),
-    (
+    TableSpec(
         "OpticalBoundsFormat1",
         [
             FieldSpec(
                 "uint16",
-                "Format",
-                description="Format of the optical bounds table, = 1.",
+                "Format", description="Format of the optical bounds table, = 1.",
             ),
             FieldSpec(
                 "AATLookup(OpticalBoundsPoints)",
@@ -4707,8 +4762,9 @@ otData = [
                 description="Lookup table associating glyphs with their optical bounds, given as references to control points.",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "OpticalBoundsDeltas",
         [
             FieldSpec(
@@ -4729,9 +4785,9 @@ otData = [
                 "Bottom",
                 description="Delta value for the bottom-side optical edge.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "OpticalBoundsPoints",
         [
             FieldSpec(
@@ -4754,12 +4810,12 @@ otData = [
                 "Bottom",
                 description="Control point index for the bottom-side optical edge, or -1 if this glyph has none.",
             ),
-        ],
+        ]
     ),
     #
     # TSIC
     #
-    (
+    TableSpec(
         "TSIC",
         [
             FieldSpec(
@@ -4792,17 +4848,17 @@ otData = [
                 aux=0,
                 description="Array of TSIC records",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LocationRecord",
         [
             FieldSpec(
                 "F2Dot14", "Axis", repeat="AxisCount", aux=0, description="Axis record"
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "TSICRecord",
         [
             FieldSpec("uint16", "Flags", description="Record flags - set to 0"),
@@ -4837,12 +4893,12 @@ otData = [
                 aux=0,
                 description="CVT value",
             ),
-        ],
+        ]
     ),
     #
     # COLR
     #
-    (
+    TableSpec(
         "COLR",
         [
             FieldSpec(
@@ -4896,9 +4952,9 @@ otData = [
                 aux="Version >= 1",
                 description="Offset to variation store (may be NULL)",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseGlyphRecordArray",
         [
             FieldSpec(
@@ -4908,9 +4964,9 @@ otData = [
                 aux=0,
                 description="Base Glyph records.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseGlyphRecord",
         [
             FieldSpec(
@@ -4928,9 +4984,9 @@ otData = [
                 "NumLayers",
                 description="Number of color layers associated with this glyph.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LayerRecordArray",
         [
             FieldSpec(
@@ -4940,9 +4996,9 @@ otData = [
                 aux=0,
                 description="Layer records.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LayerRecord",
         [
             FieldSpec(
@@ -4955,9 +5011,9 @@ otData = [
                 "PaletteIndex",
                 description="Index value to use with a selected color palette.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseGlyphList",
         [
             FieldSpec(
@@ -4972,9 +5028,9 @@ otData = [
                 aux=0,
                 description="Array of Version-1 Base Glyph records",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "BaseGlyphPaintRecord",
         [
             FieldSpec(
@@ -4985,9 +5041,9 @@ otData = [
                 "Paint",
                 description="Offset (from beginning of BaseGlyphPaintRecord) to Paint, typically a PaintColrLayers.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "LayerList",
         [
             FieldSpec("uint32", "LayerCount", description="Number of Version-1 Layers"),
@@ -4998,15 +5054,14 @@ otData = [
                 aux=0,
                 description="Array of offsets to Paint tables, from the start of the LayerList table.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ClipListFormat1",
         [
             FieldSpec(
                 "uint8",
-                "Format",
-                description="Format for ClipList with 16bit glyph IDs: 1",
+                "Format", description="Format for ClipList with 16bit glyph IDs: 1",
             ),
             FieldSpec("uint32", "ClipCount", description="Number of Clip records."),
             FieldSpec(
@@ -5017,8 +5072,9 @@ otData = [
                 description="Array of Clip records sorted by glyph ID.",
             ),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "ClipRecord",
         [
             FieldSpec(
@@ -5028,23 +5084,23 @@ otData = [
                 "uint16", "EndGlyphID", description="Last glyph ID in the range."
             ),
             FieldSpec("Offset24", "ClipBox", description="Offset to a ClipBox table."),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ClipBoxFormat1",
         [
             FieldSpec(
                 "uint8",
-                "Format",
-                description="Format for ClipBox without variation: set to 1.",
+                "Format", description="Format for ClipBox without variation: set to 1.",
             ),
             FieldSpec("int16", "xMin", description="Minimum x of clip box."),
             FieldSpec("int16", "yMin", description="Minimum y of clip box."),
             FieldSpec("int16", "xMax", description="Maximum x of clip box."),
             FieldSpec("int16", "yMax", description="Maximum y of clip box."),
         ],
+        tableFormat=1
     ),
-    (
+    TableSpec(
         "ClipBoxFormat2",
         [
             FieldSpec(
@@ -5068,6 +5124,7 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=2
     ),
     # COLRv1 Affine2x3 uses the same column-major order to serialize a 2D
     # Affine Transformation as the one used by fontTools.misc.transform.
@@ -5078,7 +5135,7 @@ otData = [
     # y-part of the x basis vector, and the third to the x-part of the y
     # basis vector.
     # See https://github.com/googlefonts/colr-gradients-spec/pull/85
-    (
+    TableSpec(
         "Affine2x3",
         [
             FieldSpec("Fixed", "xx", description="x-part of x basis vector"),
@@ -5087,9 +5144,9 @@ otData = [
             FieldSpec("Fixed", "yy", description="y-part of y basis vector"),
             FieldSpec("Fixed", "dx", description="Translation in x direction"),
             FieldSpec("Fixed", "dy", description="Translation in y direction"),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VarAffine2x3",
         [
             FieldSpec(
@@ -5119,9 +5176,9 @@ otData = [
                 "VarIndexBase",
                 description="Base index into DeltaSetIndexMap.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ColorStop",
         [
             FieldSpec("F2Dot14", "StopOffset"),
@@ -5131,9 +5188,9 @@ otData = [
             FieldSpec(
                 "F2Dot14", "Alpha", description="Values outsided [0.,1.] reserved"
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VarColorStop",
         [
             FieldSpec("F2Dot14", "StopOffset", description="VarIndexBase + 0."),
@@ -5150,9 +5207,9 @@ otData = [
                 "VarIndexBase",
                 description="Base index into DeltaSetIndexMap.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "ColorLine",
         [
             FieldSpec(
@@ -5168,9 +5225,9 @@ otData = [
                 aux=0,
                 description="Array of Color stops.",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "VarColorLine",
         [
             FieldSpec(
@@ -5186,10 +5243,10 @@ otData = [
                 aux=0,
                 description="Array of Color stops.",
             ),
-        ],
+        ]
     ),
     # PaintColrLayers
-    (
+    TableSpec(
         "PaintFormat1",
         [
             FieldSpec(
@@ -5202,9 +5259,10 @@ otData = [
             ),
             FieldSpec("uint32", "FirstLayerIndex", description="Index into LayerList."),
         ],
+        tableFormat=1
     ),
     # PaintSolid
-    (
+    TableSpec(
         "PaintFormat2",
         [
             FieldSpec(
@@ -5217,9 +5275,10 @@ otData = [
                 "F2Dot14", "Alpha", description="Values outsided [0.,1.] reserved"
             ),
         ],
+        tableFormat=2
     ),
     # PaintVarSolid
-    (
+    TableSpec(
         "PaintFormat3",
         [
             FieldSpec(
@@ -5239,9 +5298,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=3
     ),
     # PaintLinearGradient
-    (
+    TableSpec(
         "PaintFormat4",
         [
             FieldSpec(
@@ -5259,9 +5319,10 @@ otData = [
             FieldSpec("int16", "x2"),
             FieldSpec("int16", "y2"),
         ],
+        tableFormat=4
     ),
     # PaintVarLinearGradient
-    (
+    TableSpec(
         "PaintFormat5",
         [
             FieldSpec(
@@ -5284,9 +5345,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=5
     ),
     # PaintRadialGradient
-    (
+    TableSpec(
         "PaintFormat6",
         [
             FieldSpec(
@@ -5304,9 +5366,10 @@ otData = [
             FieldSpec("int16", "y1"),
             FieldSpec("uint16", "r1"),
         ],
+        tableFormat=6
     ),
     # PaintVarRadialGradient
-    (
+    TableSpec(
         "PaintFormat7",
         [
             FieldSpec(
@@ -5329,9 +5392,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=7
     ),
     # PaintSweepGradient
-    (
+    TableSpec(
         "PaintFormat8",
         [
             FieldSpec(
@@ -5355,9 +5419,10 @@ otData = [
                 description="End of the angular range of the gradient.",
             ),
         ],
+        tableFormat=8
     ),
     # PaintVarSweepGradient
-    (
+    TableSpec(
         "PaintFormat9",
         [
             FieldSpec(
@@ -5390,9 +5455,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=9
     ),
     # PaintGlyph
-    (
+    TableSpec(
         "PaintFormat10",
         [
             FieldSpec(
@@ -5407,9 +5473,10 @@ otData = [
                 "GlyphID", "Glyph", description="Glyph ID for the source outline."
             ),
         ],
+        tableFormat=10
     ),
     # PaintColrGlyph
-    (
+    TableSpec(
         "PaintFormat11",
         [
             FieldSpec(
@@ -5421,9 +5488,10 @@ otData = [
                 description="Virtual glyph ID for a BaseGlyphList base glyph.",
             ),
         ],
+        tableFormat=11
     ),
     # PaintTransform
-    (
+    TableSpec(
         "PaintFormat12",
         [
             FieldSpec(
@@ -5440,9 +5508,10 @@ otData = [
                 description="2x3 matrix for 2D affine transformations.",
             ),
         ],
+        tableFormat=12
     ),
     # PaintVarTransform
-    (
+    TableSpec(
         "PaintFormat13",
         [
             FieldSpec(
@@ -5459,9 +5528,10 @@ otData = [
                 description="2x3 matrix for 2D affine transformations.",
             ),
         ],
+        tableFormat=13
     ),
     # PaintTranslate
-    (
+    TableSpec(
         "PaintFormat14",
         [
             FieldSpec(
@@ -5475,9 +5545,10 @@ otData = [
             FieldSpec("int16", "dx", description="Translation in x direction."),
             FieldSpec("int16", "dy", description="Translation in y direction."),
         ],
+        tableFormat=14
     ),
     # PaintVarTranslate
-    (
+    TableSpec(
         "PaintFormat15",
         [
             FieldSpec(
@@ -5504,9 +5575,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=15
     ),
     # PaintScale
-    (
+    TableSpec(
         "PaintFormat16",
         [
             FieldSpec(
@@ -5520,9 +5592,10 @@ otData = [
             FieldSpec("F2Dot14", "scaleX"),
             FieldSpec("F2Dot14", "scaleY"),
         ],
+        tableFormat=16
     ),
     # PaintVarScale
-    (
+    TableSpec(
         "PaintFormat17",
         [
             FieldSpec(
@@ -5541,9 +5614,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=17
     ),
     # PaintScaleAroundCenter
-    (
+    TableSpec(
         "PaintFormat18",
         [
             FieldSpec(
@@ -5559,9 +5633,10 @@ otData = [
             FieldSpec("int16", "centerX"),
             FieldSpec("int16", "centerY"),
         ],
+        tableFormat=18
     ),
     # PaintVarScaleAroundCenter
-    (
+    TableSpec(
         "PaintFormat19",
         [
             FieldSpec(
@@ -5582,9 +5657,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=19
     ),
     # PaintScaleUniform
-    (
+    TableSpec(
         "PaintFormat20",
         [
             FieldSpec(
@@ -5597,9 +5673,10 @@ otData = [
             ),
             FieldSpec("F2Dot14", "scale"),
         ],
+        tableFormat=20
     ),
     # PaintVarScaleUniform
-    (
+    TableSpec(
         "PaintFormat21",
         [
             FieldSpec(
@@ -5617,9 +5694,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=21
     ),
     # PaintScaleUniformAroundCenter
-    (
+    TableSpec(
         "PaintFormat22",
         [
             FieldSpec(
@@ -5634,9 +5712,10 @@ otData = [
             FieldSpec("int16", "centerX"),
             FieldSpec("int16", "centerY"),
         ],
+        tableFormat=22
     ),
     # PaintVarScaleUniformAroundCenter
-    (
+    TableSpec(
         "PaintFormat23",
         [
             FieldSpec(
@@ -5656,9 +5735,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=23
     ),
     # PaintRotate
-    (
+    TableSpec(
         "PaintFormat24",
         [
             FieldSpec(
@@ -5671,9 +5751,10 @@ otData = [
             ),
             FieldSpec("Angle", "angle"),
         ],
+        tableFormat=24
     ),
     # PaintVarRotate
-    (
+    TableSpec(
         "PaintFormat25",
         [
             FieldSpec(
@@ -5691,9 +5772,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=25
     ),
     # PaintRotateAroundCenter
-    (
+    TableSpec(
         "PaintFormat26",
         [
             FieldSpec(
@@ -5708,9 +5790,10 @@ otData = [
             FieldSpec("int16", "centerX"),
             FieldSpec("int16", "centerY"),
         ],
+        tableFormat=26
     ),
     # PaintVarRotateAroundCenter
-    (
+    TableSpec(
         "PaintFormat27",
         [
             FieldSpec(
@@ -5730,9 +5813,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=27
     ),
     # PaintSkew
-    (
+    TableSpec(
         "PaintFormat28",
         [
             FieldSpec(
@@ -5746,9 +5830,10 @@ otData = [
             FieldSpec("Angle", "xSkewAngle"),
             FieldSpec("Angle", "ySkewAngle"),
         ],
+        tableFormat=28
     ),
     # PaintVarSkew
-    (
+    TableSpec(
         "PaintFormat29",
         [
             FieldSpec(
@@ -5767,9 +5852,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=29
     ),
     # PaintSkewAroundCenter
-    (
+    TableSpec(
         "PaintFormat30",
         [
             FieldSpec(
@@ -5785,9 +5871,10 @@ otData = [
             FieldSpec("int16", "centerX"),
             FieldSpec("int16", "centerY"),
         ],
+        tableFormat=30
     ),
     # PaintVarSkewAroundCenter
-    (
+    TableSpec(
         "PaintFormat31",
         [
             FieldSpec(
@@ -5808,9 +5895,10 @@ otData = [
                 description="Base index into DeltaSetIndexMap.",
             ),
         ],
+        tableFormat=31
     ),
     # PaintComposite
-    (
+    TableSpec(
         "PaintFormat32",
         [
             FieldSpec(
@@ -5832,11 +5920,12 @@ otData = [
                 description="Offset (from beginning of PaintComposite table) to backdrop Paint subtable.",
             ),
         ],
+        tableFormat=32
     ),
     #
     # avar
     #
-    (
+    TableSpec(
         "AxisValueMap",
         [
             FieldSpec(
@@ -5849,9 +5938,9 @@ otData = [
                 "ToCoordinate",
                 description="The modified, normalized coordinate value",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "AxisSegmentMap",
         [
             FieldSpec(
@@ -5866,9 +5955,9 @@ otData = [
                 aux=0,
                 description="The array of axis value map records for this axis",
             ),
-        ],
+        ]
     ),
-    (
+    TableSpec(
         "avar",
         [
             FieldSpec(
@@ -5895,14 +5984,14 @@ otData = [
                 "LOffsetTo(DeltaSetIndexMap)", "VarIdxMap", aux="Version >= 0x00020000"
             ),
             FieldSpec("LOffset", "VarStore", aux="Version >= 0x00020000"),
-        ],
+        ]
     ),
     #
     # IFT - Incremental Font Transfer tables
     # https://w3c.github.io/IFT/Overview.html
     # Reference: https://github.com/googlefonts/fontations/blob/main/read-fonts/src/tables/ift.rs
     #
-    (
+    TableSpec(
         "PatchMapFormat2",
         [
             FieldSpec(
@@ -5966,10 +6055,11 @@ otData = [
                 description="Offset from start of CFF2 table to CharStrings INDEX.",
             ),
         ],
+        tableFormat=2
     ),
     # 'MappingEntries' contains stateful, delta-encoded entry IDs.  The custom
     # 'MappingEntriesConverter' is used to do a stateful parsing of all records.
-    (
+    TableSpec(
         "MappingEntries",
         [
             FieldSpec(
@@ -5977,7 +6067,7 @@ otData = [
                 "entries",
                 description="Array of MappingEntry records.",
             )
-        ],
+        ]
     ),
-    ("EntryIdStringData", []),
+    TableSpec('EntryIdStringData', []),
 ]

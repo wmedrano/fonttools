@@ -417,6 +417,9 @@ class OTTableWriter(object):
     def __delitem__(self, name):
         del self.localState[name]
 
+    def __contains__(self, name):
+        return self.localState and name in self.localState
+
     # assembler interface
 
     def getDataLength(self):
@@ -860,7 +863,7 @@ class CountReference(object):
         v = self.table[self.name]
         if v is None:
             v = 0
-        return {1: packUInt8, 2: packUShort, 4: packULong}[self.size](v)
+        return {1: packUInt8, 2: packUShort, 3: packUInt24, 4: packULong}[self.size](v)
 
 
 def packUInt8(value):
@@ -983,10 +986,16 @@ class BaseTable(object):
                         countValue = conv.repeat
                     elif conv.repeat in table:
                         countValue = table[conv.repeat]
-                    else:
-                        # conv.repeat is a propagated count
+                    elif conv.repeat in reader:
                         countValue = reader[conv.repeat]
-                    countValue += conv.aux
+                    else:
+                        # Evaluate repeat expression using combined parent
+                        # reader state and local table fields (e.g.
+                        # repeat="GlyphCount - FirstMappedGlyph").
+                        context = dict(getattr(reader, "localState", {}))
+                        context.update(table)
+                        countValue = eval(conv.repeat, None, context)
+                    countValue += conv.aux or 0
                     table[conv.name] = conv.readArray(reader, font, table, countValue)
                 else:
                     if conv.aux and not eval(conv.aux, None, table):
@@ -1046,17 +1055,30 @@ class BaseTable(object):
             if conv.repeat:
                 if value is None:
                     value = []
-                countValue = len(value) - conv.aux
-                if isinstance(conv.repeat, int):
-                    assert len(value) == conv.repeat, "expected %d values, got %d" % (
-                        conv.repeat,
+                repeatName = conv.repeat
+                countValue = len(value) - (conv.aux or 0)
+                if isinstance(repeatName, int):
+                    assert len(value) == repeatName, "expected %d values, got %d" % (
+                        repeatName,
                         len(value),
                     )
-                elif conv.repeat in table:
-                    CountReference(table, conv.repeat, value=countValue)
+                elif repeatName in table:
+                    CountReference(table, repeatName, value=countValue)
+                elif repeatName in writer:
+                    writer[repeatName].setValue(countValue)
                 else:
-                    # conv.repeat is a propagated count
-                    writer[conv.repeat].setValue(countValue)
+                    # Evaluate repeat expression using combined parent
+                    # writer state and local table fields.
+                    context = {
+                        k: (v.getValue() if hasattr(v, "getValue") else v)
+                        for k, v in getattr(writer, "localState", {}).items()
+                    }
+                    context.update(table)
+                    expected = eval(repeatName, None, context)
+                    assert len(value) == expected, "expected %d values, got %d" % (
+                        expected,
+                        len(value),
+                    )
                 try:
                     conv.writeArray(writer, font, table, value)
                 except Exception as e:
@@ -1233,8 +1255,15 @@ class FormatSwitchingBaseTable(BaseTable):
     def getConverterByName(self, name):
         return self.convertersByName[self.Format][name]
 
+    formatSize = 2
+
     def readFormat(self, reader):
-        self.Format = reader.readUShort()
+        if not hasattr(self, "Format"):
+            self.Format = reader.readUShort()
+        if self.Format not in self.converters:
+            raise KeyError(
+                "Format %d not found in %s" % (self.Format, self.__class__.__name__)
+            )
 
     def writeFormat(self, writer):
         writer.writeUShort(self.Format)
@@ -1249,6 +1278,7 @@ class FormatSwitchingBaseTable(BaseTable):
 class UInt8FormatSwitchingBaseTable(FormatSwitchingBaseTable):
     def readFormat(self, reader):
         self.Format = reader.readUInt8()
+        FormatSwitchingBaseTable.readFormat(self, reader)
 
     def writeFormat(self, writer):
         writer.writeUInt8(self.Format)

@@ -57,10 +57,13 @@ def buildConverters(tableSpec: list[FieldSpec], tableNamespace):
         if spec.name.startswith("ValueFormat"):
             assert spec.type == "uint16"
             converterClass = ValueFormat
+        elif spec.name == "GlyphCount" and spec.type == "uint24":
+            converterClass = PatchMapGlyphCount
         elif spec.name.endswith("Count") or spec.name in ("StructLength", "MorphType"):
             converterClass = {
                 "uint8": ComputedUInt8,
                 "uint16": ComputedUShort,
+                "uint24": ComputedUInt24,
                 "uint32": ComputedULong,
             }[spec.type]
         elif spec.name == "SubTable":
@@ -396,6 +399,19 @@ class ComputedUShort(ComputedInt, UShort):
 
 class ComputedULong(ComputedInt, ULong):
     pass
+
+
+class ComputedUInt24(ComputedInt, UInt24):
+    pass
+
+
+class PatchMapGlyphCount(UInt24):
+    """Converter for 24-bit GlyphCount in PatchMap format tables."""
+
+    def __init__(self, name, repeat, aux, description=""):
+        super().__init__(name, repeat, aux, description=description)
+        self.isCount = False
+        self.isPropagated = True
 
 
 class Tag(SimpleValue):

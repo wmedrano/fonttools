@@ -3,7 +3,9 @@ from fontTools.misc.textTools import deHexStr, hexStr
 from fontTools.misc.xmlWriter import XMLWriter
 from fontTools.ttLib.tables.otBase import OTTableReader, OTTableWriter
 import fontTools.ttLib.tables.otTables as otTables
+from fontTools.ttLib import TTLibError
 from io import StringIO
+import struct
 from types import SimpleNamespace
 from textwrap import dedent
 import unittest
@@ -929,6 +931,451 @@ def test_parse_Device_DeltaValue_from_XML_and_compile():
     gpos2.decompile(reader, font)
 
     assert dedent("\n".join(getXML(gpos2.toXML, font)[1:-1])) == gpos_xml
+
+
+class PatchMapTest(unittest.TestCase):
+    def test_appliedEntriesBitmapRepeat(self):
+        test_cases = [
+            (0, [0x01]),
+            (6, [0x7F]),
+            (7, [0xFF]),
+            (8, [0xFF, 0x01]),
+            (15, [0xFF, 0xFF]),
+            (16, [0xFF, 0xFF, 0x01]),
+        ]
+        for maxEntryIndex, bitmap in test_cases:
+            with self.subTest(maxEntryIndex=maxEntryIndex):
+                table = otTables.PatchMap()
+                table.Format = 1
+                table.Reserved = 0
+                table.Flags = 0
+                table.CompatibilityId = [1, 2, 3, 4]
+                table.MaxEntryIndex = maxEntryIndex
+                table.MaxGlyphMapEntryIndex = 0
+                table.GlyphCount = 0
+                table.GlyphMap = None
+                table.FeatureMap = None
+                table.AppliedEntriesBitmap = bitmap
+                table.UrlTemplateLength = 0
+                table.UrlTemplate = []
+                table.PatchFormat = 1
+
+                writer = OTTableWriter()
+                table.compile(writer, FakeFont([]))
+                data = writer.getAllData()
+
+                reader = OTTableReader(data, tableTag="PatchMap")
+                table2 = otTables.PatchMap()
+                table2.decompile(reader, FakeFont([]))
+
+                self.assertEqual(table2.MaxEntryIndex, maxEntryIndex)
+                self.assertEqual(table2.AppliedEntriesBitmap, bitmap)
+
+
+class PatchMapFormat1SchemaTest(unittest.TestCase):
+    def _make_table(self, flags=0, cff_offset=None, cff2_offset=None):
+        table = otTables.PatchMap()
+        table.Format = 1
+        table.Reserved = 0
+        table.Flags = flags
+        table.CompatibilityId = [0x11223344, 0x55667788, 0x99AABBCC, 0xDDEEFF00]
+        table.MaxEntryIndex = 15
+        table.MaxGlyphMapEntryIndex = 0
+        table.GlyphCount = 0
+        table.GlyphMap = None
+        table.FeatureMap = None
+        table.AppliedEntriesBitmap = [0xAA, 0x55]
+        table.UrlTemplateLength = 3
+        table.UrlTemplate = [ord("a"), ord("b"), ord("c")]
+        table.PatchFormat = 1
+        if cff_offset is not None:
+            table.CffCharStringsOffset = cff_offset
+        if cff2_offset is not None:
+            table.Cff2CharStringsOffset = cff2_offset
+        return table
+
+    def test_schema_flags_0(self):
+        table = self._make_table(flags=0)
+        writer = OTTableWriter()
+        table.compile(writer, FakeFont([]))
+        data = writer.getAllData()
+
+        # MIN_SIZE (39) + AppliedEntriesBitmap (2) + UrlTemplate (3) = 44 bytes
+        self.assertEqual(len(data), 44)
+
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table2 = otTables.PatchMap()
+        table2.decompile(reader, FakeFont([]))
+        self.assertEqual(getattr(table2, "CffCharStringsOffset", None), None)
+        self.assertEqual(getattr(table2, "Cff2CharStringsOffset", None), None)
+        self.assertEqual(table2.UrlTemplate, [ord("a"), ord("b"), ord("c")])
+
+    def test_schema_flags_1(self):
+        table = self._make_table(flags=0x01, cff_offset=0x12345678)
+        writer = OTTableWriter()
+        table.compile(writer, FakeFont([]))
+        data = writer.getAllData()
+
+        # 44 base bytes + 4 bytes for CffCharStringsOffset = 48 bytes
+        self.assertEqual(len(data), 48)
+
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table2 = otTables.PatchMap()
+        table2.decompile(reader, FakeFont([]))
+        self.assertEqual(table2.CffCharStringsOffset, 0x12345678)
+        self.assertEqual(getattr(table2, "Cff2CharStringsOffset", None), None)
+
+    def test_schema_flags_3(self):
+        table = self._make_table(
+            flags=0x03, cff_offset=0x11111111, cff2_offset=0x22222222
+        )
+        writer = OTTableWriter()
+        table.compile(writer, FakeFont([]))
+        data = writer.getAllData()
+
+        # 44 base bytes + 4 (CFF) + 4 (CFF2) = 52 bytes
+        self.assertEqual(len(data), 52)
+
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table2 = otTables.PatchMap()
+        table2.decompile(reader, FakeFont([]))
+        self.assertEqual(table2.CffCharStringsOffset, 0x11111111)
+        self.assertEqual(table2.Cff2CharStringsOffset, 0x22222222)
+
+    def test_invalid_bitmap_length_raises(self):
+        table = self._make_table(flags=0)
+        table.AppliedEntriesBitmap = [0xAA]  # MaxEntryIndex is 15, expected length is 2 bytes
+        writer = OTTableWriter()
+        with self.assertRaisesRegex(AssertionError, "expected 2 values, got 1"):
+            table.compile(writer, FakeFont([]))
+
+
+class PatchMapPortedSpecTest(unittest.TestCase):
+    """Ported unit tests from fontations incremental-font-transfer patchmap.rs
+    and font-test-data ift.rs Format 1 fixtures.
+    """
+
+    def test_simple_format1(self):
+        data = (
+            bytes(
+                [
+                    1,  # Format = 1
+                    0,
+                    0,
+                    0,  # Reserved = 0
+                    0,  # Flags = 0
+                    0,
+                    0,
+                    0,
+                    1,  # CompatibilityId[0] = 1
+                    0,
+                    0,
+                    0,
+                    2,  # CompatibilityId[1] = 2
+                    0,
+                    0,
+                    0,
+                    3,  # CompatibilityId[2] = 3
+                    0,
+                    0,
+                    0,
+                    4,  # CompatibilityId[3] = 4
+                    0,
+                    2,  # MaxEntryIndex = 2
+                    0,
+                    2,  # MaxGlyphMapEntryIndex = 2
+                    0,
+                    0,
+                    7,  # GlyphCount = 7
+                    0,
+                    0,
+                    0,
+                    46,  # GlyphMap offset = 46
+                    0,
+                    0,
+                    0,
+                    0,  # FeatureMap offset = 0
+                    0b00000010,  # AppliedEntriesBitmap = [2]
+                    0,
+                    6,  # UrlTemplateLength = 6
+                    4,
+                    0x66,
+                    0x6F,
+                    0x6F,
+                    0x2F,
+                    128,  # UrlTemplate
+                    3,  # PatchFormat = 3
+                ]
+            )
+            + bytes([0, 1, 2, 1, 0, 1, 0, 0])
+        )
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table = otTables.PatchMap()
+        table.decompile(reader, FakeFont([]))
+        self.assertEqual(table.Format, 1)
+        self.assertEqual(table.CompatibilityId, [1, 2, 3, 4])
+        self.assertEqual(table.MaxEntryIndex, 2)
+        self.assertEqual(table.MaxGlyphMapEntryIndex, 2)
+        self.assertEqual(table.GlyphCount, 7)
+        self.assertEqual(table.AppliedEntriesBitmap, [0b00000010])
+        self.assertEqual(table.UrlTemplateLength, 6)
+        self.assertEqual(
+            table.UrlTemplate, [4, ord("f"), ord("o"), ord("o"), ord("/"), 128]
+        )
+        self.assertEqual(table.PatchFormat, 3)
+        self.assertEqual(table.GlyphMap.FirstMappedGlyph, 1)
+        self.assertEqual(table.GlyphMap.EntryIndex, [2, 1, 0, 1, 0, 0])
+        self.assertIsNone(getattr(table, "CffCharStringsOffset", None))
+        self.assertIsNone(getattr(table, "Cff2CharStringsOffset", None))
+
+        writer = OTTableWriter()
+        table.compile(writer, FakeFont([]))
+        self.assertEqual(writer.getAllData(), data)
+
+    def test_format1_with_dup_urls(self):
+        data = (
+            bytes(
+                [
+                    1,  # Format = 1
+                    0,
+                    0,
+                    0,  # Reserved = 0
+                    0,  # Flags = 0
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    2,
+                    0,
+                    0,
+                    0,
+                    3,
+                    0,
+                    0,
+                    0,
+                    4,
+                    0,
+                    4,  # MaxEntryIndex = 4
+                    0,
+                    4,  # MaxGlyphMapEntryIndex = 4
+                    0,
+                    0,
+                    7,  # GlyphCount = 7
+                    0,
+                    0,
+                    0,
+                    49,  # GlyphMap offset = 49
+                    0,
+                    0,
+                    0,
+                    0,  # FeatureMap offset = 0
+                    0b00000010,  # AppliedEntriesBitmap = [2]
+                    0,
+                    9,  # UrlTemplateLength = 9
+                    8,
+                    ord("f"),
+                    ord("o"),
+                    ord("o"),
+                    ord("/"),
+                    ord("b"),
+                    ord("a"),
+                    ord("a"),
+                    ord("r"),
+                    3,  # PatchFormat = 3
+                ]
+            )
+            + bytes([0, 1, 2, 3, 4, 0, 0, 0])
+        )
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table = otTables.PatchMap()
+        table.decompile(reader, FakeFont([]))
+        self.assertEqual(table.MaxEntryIndex, 4)
+        self.assertEqual(table.UrlTemplateLength, 9)
+        self.assertEqual(
+            table.UrlTemplate,
+            [
+                8,
+                ord("f"),
+                ord("o"),
+                ord("o"),
+                ord("/"),
+                ord("b"),
+                ord("a"),
+                ord("a"),
+                ord("r"),
+            ],
+        )
+        self.assertEqual(table.GlyphMap.FirstMappedGlyph, 1)
+        self.assertEqual(table.GlyphMap.EntryIndex, [2, 3, 4, 0, 0, 0])
+
+        writer = OTTableWriter()
+        table.compile(writer, FakeFont([]))
+        self.assertEqual(writer.getAllData(), data)
+
+    def test_simple_format1_with_one_charstrings_offset(self):
+        data = (
+            bytes(
+                [
+                    1,  # Format = 1
+                    0,
+                    0,
+                    0,  # Reserved = 0
+                    1,  # Flags = 1 (CFF present)
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    2,
+                    0,
+                    0,
+                    0,
+                    3,
+                    0,
+                    0,
+                    0,
+                    4,
+                    0,
+                    2,  # MaxEntryIndex = 2
+                    0,
+                    2,  # MaxGlyphMapEntryIndex = 2
+                    0,
+                    0,
+                    7,  # GlyphCount = 7
+                    0,
+                    0,
+                    0,
+                    52,  # GlyphMap offset = 52
+                    0,
+                    0,
+                    0,
+                    0,  # FeatureMap offset = 0
+                    0b00000010,  # AppliedEntriesBitmap = [2]
+                    0,
+                    8,  # UrlTemplateLength = 8
+                    ord("A"),
+                    ord("B"),
+                    ord("C"),
+                    ord("D"),
+                    ord("E"),
+                    ord("F"),
+                    0xC9,
+                    0xA4,
+                    3,  # PatchFormat = 3
+                    0,
+                    0,
+                    1,
+                    200,  # CffCharStringsOffset = 456
+                ]
+            )
+            + bytes([0, 1, 2, 1, 0, 1, 0, 0])
+        )
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table = otTables.PatchMap()
+        table.decompile(reader, FakeFont([]))
+        self.assertEqual(table.CffCharStringsOffset, 456)
+        self.assertEqual(table.GlyphMap.FirstMappedGlyph, 1)
+        self.assertEqual(table.GlyphMap.EntryIndex, [2, 1, 0, 1, 0, 0])
+        self.assertIsNone(getattr(table, "Cff2CharStringsOffset", None))
+
+        writer = OTTableWriter()
+        table.compile(writer, FakeFont([]))
+        self.assertEqual(writer.getAllData(), data)
+
+    def test_simple_format1_with_two_charstrings_offsets(self):
+        data = (
+            bytes(
+                [
+                    1,  # Format = 1
+                    0,
+                    0,
+                    0,  # Reserved = 0
+                    3,  # Flags = 3 (both CFF and CFF2 present)
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    2,
+                    0,
+                    0,
+                    0,
+                    3,
+                    0,
+                    0,
+                    0,
+                    4,
+                    0,
+                    2,  # MaxEntryIndex = 2
+                    0,
+                    2,  # MaxGlyphMapEntryIndex = 2
+                    0,
+                    0,
+                    7,  # GlyphCount = 7
+                    0,
+                    0,
+                    0,
+                    56,  # GlyphMap offset = 56
+                    0,
+                    0,
+                    0,
+                    0,  # FeatureMap offset = 0
+                    0b00000010,  # AppliedEntriesBitmap = [2]
+                    0,
+                    8,  # UrlTemplateLength = 8
+                    ord("A"),
+                    ord("B"),
+                    ord("C"),
+                    ord("D"),
+                    ord("E"),
+                    ord("F"),
+                    0xC9,
+                    0xA4,
+                    3,  # PatchFormat = 3
+                    0,
+                    0,
+                    1,
+                    200,  # CffCharStringsOffset = 456
+                    0,
+                    0,
+                    3,
+                    21,  # Cff2CharStringsOffset = 789
+                ]
+            )
+            + bytes([0, 1, 2, 1, 0, 1, 0, 0])
+        )
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table = otTables.PatchMap()
+        table.decompile(reader, FakeFont([]))
+        self.assertEqual(table.CffCharStringsOffset, 456)
+        self.assertEqual(table.Cff2CharStringsOffset, 789)
+        self.assertEqual(table.GlyphMap.FirstMappedGlyph, 1)
+        self.assertEqual(table.GlyphMap.EntryIndex, [2, 1, 0, 1, 0, 0])
+
+        writer = OTTableWriter()
+        table.compile(writer, FakeFont([]))
+        self.assertEqual(writer.getAllData(), data)
+
+    def test_rejects_invalid_format(self):
+        data = bytes([3, 0, 0, 0, 0])
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table = otTables.PatchMap()
+        with self.assertRaises(KeyError):
+            table.decompile(reader, FakeFont([]))
+
+    def test_format_1_patch_map_too_short(self):
+        data = bytes([1, 0, 0, 0, 0, 0, 0, 0, 1])  # Only 9 bytes
+        reader = OTTableReader(data, tableTag="PatchMap")
+        table = otTables.PatchMap()
+        with self.assertRaises((struct.error, TTLibError)):
+            table.decompile(reader, FakeFont([]))
 
 
 if __name__ == "__main__":

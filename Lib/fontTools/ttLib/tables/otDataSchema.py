@@ -22,11 +22,12 @@ class FieldSpec(NamedTuple):
         repeat: If the field is an array, this defines how many times it
             repeats. It can be an integer, or the name of another field (usually
             a 'Count' field) that contains the number of repetitions. If it is a
-            string, it is used to lookup the count value from the table.
+            string that does not match a field name in the table or reader/writer,
+            it falls back to being evaluated as a Python expression.
         aux: Auxiliary data used by some converters. When `repeat` is not set
-            and `aux` is a string, it is often compiled into a Python
-            expression for evaluation. For repeating structs, it is often used
-            as a constant or an expression.
+            and `aux` is a string, it is compiled into a Python expression for
+            conditional evaluation. For repeating arrays, it is an additive
+            integer delta applied to the count value.
         description: A human-readable description of the field's purpose.
     """
 

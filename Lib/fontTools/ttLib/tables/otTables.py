@@ -2635,6 +2635,7 @@ class EntryIdStringData(BaseTable):
 
 def _buildClasses():
     import re
+    from .otBase import getFormatSwitchingBaseTableClass
     from .otData import otData
 
     formatPat = re.compile(r"([A-Za-z0-9]+)Format(\d+)$")

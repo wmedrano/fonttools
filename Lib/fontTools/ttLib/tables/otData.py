@@ -5897,11 +5897,87 @@ otData = [
             FieldSpec("LOffset", "VarStore", aux="Version >= 0x00020000"),
         ],
     ),
-    #
     # IFT - Incremental Font Transfer tables
     # https://w3c.github.io/IFT/Overview.html
     # Reference: https://github.com/googlefonts/fontations/blob/main/read-fonts/src/tables/ift.rs
-    #
+    (
+        "PatchMapFormat1",
+        [
+            FieldSpec("uint8", "Format", description="Set to 1, identifies this as format 1."),
+            FieldSpec("uint24", "Reserved", description="Not used, set to 0."),
+            FieldSpec(
+                "uint8",
+                "Flags",
+                description="Bit 0: CffCharStringsOffset present. Bit 1: Cff2CharStringsOffset present.",
+            ),
+            FieldSpec(
+                "uint32",
+                "CompatibilityId",
+                repeat=4,
+                aux=0,
+                description="Unique ID to identify compatible patches (16 bytes).",
+            ),
+            FieldSpec(
+                "uint16",
+                "MaxEntryIndex",
+                description="Largest entry index which appears in either the glyph map or feature map.",
+            ),
+            FieldSpec(
+                "uint16",
+                "MaxGlyphMapEntryIndex",
+                description="Largest entry index which appears in the glyph map.",
+            ),
+            FieldSpec(
+                "uint24",
+                "GlyphCount",
+            ),
+            FieldSpec(
+                "LOffset",
+                "GlyphMap",
+                description="Maps glyph ids to entry indices.",
+            ),
+            FieldSpec(
+                "LOffset",
+                "FeatureMap",
+                description="Maps feature and glyph ids to entry indices.",
+            ),
+            FieldSpec(
+                "uint8",
+                "AppliedEntriesBitmap",
+                repeat="(MaxEntryIndex + 8) // 8",
+                aux=0,
+            ),
+            FieldSpec(
+                "uint16",
+                "UrlTemplateLength",
+                description="Length of the urlTemplate byte array.",
+            ),
+            FieldSpec(
+                "uint8",
+                "UrlTemplate",
+                repeat="UrlTemplateLength",
+                aux=0,
+                description="URL Template bytes used to produce URL strings for each entry.",
+            ),
+            FieldSpec(
+                "uint8",
+                "PatchFormat",
+                description="Patch format number for patches referenced by this mapping.",
+            ),
+            FieldSpec(
+                "uint32",
+                "CffCharStringsOffset",
+                aux="Flags & 0x01",
+                description="Offset from start of CFF table to CharStrings INDEX.",
+            ),
+            FieldSpec(
+                "uint32",
+                "Cff2CharStringsOffset",
+                aux="Flags & 0x02",
+                description="Offset from start of CFF2 table to CharStrings INDEX.",
+            ),
+        ],
+    ),
     (
         "PatchMapFormat2",
         [
@@ -5964,6 +6040,23 @@ otData = [
                 "Cff2CharStringsOffset",
                 aux="Flags & 0x02",
                 description="Offset from start of CFF2 table to CharStrings INDEX.",
+            ),
+        ],
+    ),
+    (
+        "GlyphMap",
+        [
+            FieldSpec(
+                "uint16",
+                "FirstMappedGlyph",
+                description="The first glyph ID mapped by this subtable.",
+            ),
+            FieldSpec(
+                "uint8",
+                "EntryIndex",
+                repeat="GlyphCount - FirstMappedGlyph",
+                aux=0,
+                description="Array of entry indices.",
             ),
         ],
     ),
